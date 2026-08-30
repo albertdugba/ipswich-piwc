@@ -6,6 +6,7 @@ const styles: Record<MembershipStatus, string> = {
   REGULAR_ATTENDEE: 'bg-sky-50 text-sky-700',
   VISITOR: 'bg-amber-50 text-amber-700',
   INACTIVE: 'bg-muted text-muted-foreground',
+  DECEASED: 'bg-neutral-200 text-neutral-700',
 }
 
 export function MembershipBadge({ status }: { status: MembershipStatus }) {

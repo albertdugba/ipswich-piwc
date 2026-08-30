@@ -3,6 +3,7 @@ export const membershipStatusValues = [
   'REGULAR_ATTENDEE',
   'MEMBER',
   'INACTIVE',
+  'DECEASED',
 ] as const
 export type MembershipStatus = (typeof membershipStatusValues)[number]
 
@@ -11,6 +12,7 @@ export const membershipStatusLabels: Record<MembershipStatus, string> = {
   REGULAR_ATTENDEE: 'Regular attendee',
   MEMBER: 'Member',
   INACTIVE: 'Inactive',
+  DECEASED: 'Deceased',
 }
 
 export const genderValues = ['MALE', 'FEMALE'] as const

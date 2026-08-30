@@ -84,13 +84,14 @@ function FundDetailPage() {
   const allPeople = peopleQuery.data ?? NO_PEOPLE
 
   const eligible = useMemo(() => {
-    if (!fund?.departmentId) return allPeople
+    const living = allPeople.filter((p) => p.membershipStatus !== 'DECEASED')
+    if (!fund?.departmentId) return living
     const ids = new Set(
       (membershipsQuery.data ?? [])
         .filter((m) => m.departmentId === fund.departmentId)
         .map((m) => m.personId),
     )
-    return allPeople.filter((p) => ids.has(p.id))
+    return living.filter((p) => ids.has(p.id))
   }, [fund?.departmentId, allPeople, membershipsQuery.data])
 
   const summary = useMemo(

@@ -53,6 +53,7 @@ function toDefaults(person?: Person): PersonFormInput {
     maritalStatus: person?.maritalStatus ?? undefined,
     marriageDate: person?.marriageDate ?? '',
     notes: person?.notes ?? '',
+    smsOptOut: person?.smsOptOut ?? false,
     isActive: person?.isActive ?? true,
   }
 }
@@ -234,25 +235,51 @@ export function PersonForm({
           <Textarea {...register('notes')} rows={3} />
         </Field>
 
-        <Controller
-          control={control}
-          name="isActive"
-          render={({ field }) => (
-            <button
-              type="button"
-              onClick={() => field.onChange(!field.value)}
-              className="flex w-fit items-center gap-2 text-sm text-foreground"
-            >
-              <Checkbox
-                checked={field.value}
-                aria-hidden
-                tabIndex={-1}
-                className="pointer-events-none"
-              />
-              Active
-            </button>
-          )}
-        />
+        <div className="space-y-3">
+          <Controller
+            control={control}
+            name="isActive"
+            render={({ field }) => (
+              <button
+                type="button"
+                onClick={() => field.onChange(!field.value)}
+                className="flex w-fit items-center gap-2 text-sm text-foreground"
+              >
+                <Checkbox
+                  checked={field.value}
+                  aria-hidden
+                  tabIndex={-1}
+                  className="pointer-events-none"
+                />
+                Active
+              </button>
+            )}
+          />
+          <Controller
+            control={control}
+            name="smsOptOut"
+            render={({ field }) => (
+              <button
+                type="button"
+                onClick={() => field.onChange(!field.value)}
+                className="flex w-fit items-start gap-2 text-left text-sm text-foreground"
+              >
+                <Checkbox
+                  checked={field.value}
+                  aria-hidden
+                  tabIndex={-1}
+                  className="pointer-events-none mt-0.5"
+                />
+                <span>
+                  Do not send text messages
+                  <span className="block text-xs text-muted-foreground">
+                    Excludes them from birthday and anniversary messages.
+                  </span>
+                </span>
+              </button>
+            )}
+          />
+        </div>
 
         {error ? (
           <p

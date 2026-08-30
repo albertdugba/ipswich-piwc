@@ -34,6 +34,7 @@ function toDocData(values: PersonFormValues) {
     maritalStatus: values.maritalStatus ?? null,
     marriageDate: values.marriageDate ?? null,
     notes: values.notes ?? null,
+    smsOptOut: values.smsOptOut ?? false,
     isActive: values.isActive,
   }
 }
@@ -59,6 +60,7 @@ function toPerson(id: string, d: DocumentData): Person {
     maritalStatus: d.maritalStatus ?? null,
     marriageDate: d.marriageDate ?? null,
     notes: d.notes ?? null,
+    smsOptOut: d.smsOptOut ?? false,
     isActive: d.isActive ?? true,
     createdAt: d.createdAt ?? 0,
     updatedAt: d.updatedAt ?? 0,

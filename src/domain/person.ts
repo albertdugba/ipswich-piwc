@@ -31,6 +31,7 @@ export interface Person {
   marriageDate?: string | null
 
   notes?: string | null
+  smsOptOut?: boolean | null
   isActive: boolean
 
   createdAt: number
@@ -77,6 +78,7 @@ export const personFormSchema = z.object({
   marriageDate: optionalDate,
 
   notes: optionalString,
+  smsOptOut: z.boolean(),
   isActive: z.boolean(),
 })
 
@@ -88,5 +90,6 @@ export const emptyPersonForm = {
   firstName: '',
   lastName: '',
   membershipStatus: 'VISITOR',
+  smsOptOut: false,
   isActive: true,
 } satisfies Partial<PersonFormValues>

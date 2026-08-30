@@ -76,7 +76,11 @@ function RecordAttendancePage() {
     [presentQuery.data],
   )
 
-  const people = peopleQuery.data ?? NO_PEOPLE
+  const allPeople = peopleQuery.data ?? NO_PEOPLE
+  const people = useMemo(
+    () => allPeople.filter((p) => p.membershipStatus !== 'DECEASED'),
+    [allPeople],
+  )
   const presentCount = present.size
   const absentCount = Math.max(people.length - presentCount, 0)
   const pct = people.length

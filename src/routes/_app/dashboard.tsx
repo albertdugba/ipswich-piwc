@@ -7,14 +7,13 @@ import {
 } from '@/lib/icons'
 import { PageHeader, StatCard } from '@/components/ui'
 import {
-  AnniversariesCard,
   AttendanceTrendCard,
-  BirthdaysCard,
   MinistryBreakdownCard,
   NeedsAttentionCard,
   RecentActivityCard,
 } from '@/features/dashboard/components'
 import { dashboardMock } from '@/features/dashboard/mock-data'
+import { UpcomingCelebrationsCard } from '@/features/reminders/UpcomingCelebrationsCard'
 
 export const Route = createFileRoute('/_app/dashboard')({
   loader: () => ({ summary: dashboardMock }),
@@ -67,14 +66,11 @@ function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <BirthdaysCard data={summary.birthdays} />
-        <AnniversariesCard data={summary.anniversaries} />
+        <UpcomingCelebrationsCard windowDays={7} />
+        <MinistryBreakdownCard data={summary.ministries} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <MinistryBreakdownCard data={summary.ministries} />
-        <RecentActivityCard data={summary.recentActivity} />
-      </div>
+      <RecentActivityCard data={summary.recentActivity} />
     </div>
   )
 }
