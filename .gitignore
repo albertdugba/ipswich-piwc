@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+.output
+.nitro
+.tanstack
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+firebase-service-account.json
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+
+# Test / coverage
+coverage

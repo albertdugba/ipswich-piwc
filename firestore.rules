@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// -----------------------------------------------------------------------------
+// Firestore security rules for Ipswich PIWC.
+//
+// ⚠️  DEVELOPMENT RULES — these currently allow all reads/writes so the app is
+//     usable while authentication is still mocked (see src/lib/auth/session.ts).
+//     They MUST be tightened before any real/production data is stored.
+//
+// Once real Firebase Auth is wired, replace the body below with the commented
+// "production target": require request.auth != null, and enforce role/field
+// rules that mirror src/lib/auth/permissions.ts (e.g. only church admins write
+// people; sensitive fields gated by custom claims).
+// -----------------------------------------------------------------------------
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // DEV: open access. Remove before production.
+    match /{document=**} {
+      allow read, write: if true;
+    }
+
+    // PRODUCTION TARGET (enable once auth is live):
+    // match /people/{personId} {
+    //   allow read:  if request.auth != null;
+    //   allow write: if request.auth != null
+    //                && request.auth.token.role in ['SUPER_ADMIN', 'CHURCH_ADMIN'];
+    // }
+  }
+}

@@ -1,0 +1,7 @@
+node_modules
+dist
+.output
+.nitro
+drizzle
+pnpm-lock.yaml
+src/routeTree.gen.ts
