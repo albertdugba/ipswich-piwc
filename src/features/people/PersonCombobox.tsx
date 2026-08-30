@@ -14,18 +14,10 @@ import { membershipStatusLabels } from '@/domain/enums'
 import { displayName, initials } from '@/lib/utils'
 import type { Person } from '@/domain/person'
 
-/*
- * Shared person picker. A congregation outgrows a scrollable <Select> quickly,
- * and matching on email/phone is what lets you tell apart two people who share
- * a name — so every "choose a person" field in the app should use this.
- */
-
-/** Secondary line under a person's name — whatever identifies them best. */
 export function personHint(p: Person) {
   return p.email || p.phone || membershipStatusLabels[p.membershipStatus]
 }
 
-/** Match on name, email and phone so a query like "07" or "@gmail" works. */
 export function matchesPerson(p: Person, query: string) {
   const q = query.trim().toLowerCase()
   if (!q) return true

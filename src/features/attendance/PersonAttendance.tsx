@@ -1,10 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePersonAttendance, useServices } from './queries'
 
-/*
- * Person-side attendance summary for the member profile: how many services
- * they've attended and their attendance rate across all recorded services.
- */
 export function PersonAttendance({ personId }: { personId: string }) {
   const attended = usePersonAttendance(personId)
   const services = useServices()

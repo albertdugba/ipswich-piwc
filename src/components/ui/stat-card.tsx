@@ -6,10 +6,6 @@ import {
 } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-/*
- * A dashboard KPI tile. `trend` is an optional percentage change; positive
- * renders green with an up arrow, negative red with a down arrow.
- */
 export function StatCard({
   label,
   value,

@@ -11,7 +11,6 @@ import {
   Tick02Icon,
 } from '@hugeicons/core-free-icons'
 
-// Hugeicons wrappers matching the shadcn icon call sites in this file.
 function ChevronDownIcon({ className }: { className?: string }) {
   return <HugeiconsIcon icon={ArrowDown01Icon} className={className} />
 }

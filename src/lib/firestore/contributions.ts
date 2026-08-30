@@ -22,19 +22,6 @@ import type {
 import { paymentMethodValues } from '@/domain/enums'
 import type { ContributionKind, PaymentMethod } from '@/domain/enums'
 
-/*
- * Contributions data access (Cloud Firestore, client Web SDK).
- *
- * Collections:
- *   contributionFunds     — one doc per collection / appeal / dues cycle
- *   contributionRecords   — one doc per payment, auto-id (a person may pay in
- *                           instalments, so this is many-per-person-per-fund)
- *
- * `totalAmount` and `contributorCount` are denormalised onto the fund so the
- * list page renders without reading every record. They are always RECOMPUTED
- * from the records after a write rather than incremented — two people recording
- * cash at the same time would otherwise silently drift the totals apart.
- */
 const FUNDS = 'contributionFunds'
 const RECORDS = 'contributionRecords'
 
@@ -59,12 +46,6 @@ function toFund(id: string, d: DocumentData): ContributionFund {
   }
 }
 
-/*
- * A stored method that is no longer offered (a retired option, or a value
- * written by an older build) reads back as OTHER rather than as an unknown
- * string — otherwise `paymentMethodLabels[method]` is undefined and the row
- * renders a blank cell.
- */
 function toPaymentMethod(value: unknown): PaymentMethod {
   return paymentMethodValues.includes(value as PaymentMethod)
     ? (value as PaymentMethod)
@@ -85,13 +66,10 @@ function toRecord(id: string, d: DocumentData): ContributionRecord {
   }
 }
 
-/** Optional fields are written as `null`, never `undefined` (Firestore rejects it). */
 function toFundDocData(values: ContributionFundFormValues) {
   return {
     name: values.name,
     kind: values.kind,
-    // Only the kind that uses a field keeps it, so switching kind can't leave
-    // a stale department or beneficiary behind.
     departmentId:
       values.kind === 'MINISTRY_DUES' ? (values.departmentId ?? null) : null,
     beneficiaryPersonId:
@@ -109,9 +87,6 @@ function toFundDocData(values: ContributionFundFormValues) {
   }
 }
 
-/* ---- Funds ---------------------------------------------------------------- */
-
-/** Funds, newest first. */
 export async function listFunds(): Promise<ContributionFund[]> {
   const db = getFirebaseDb()
   const snap = await getDocs(
@@ -152,13 +127,11 @@ export async function updateFund(
   })
 }
 
-/** Delete a fund and every contribution recorded against it. */
 export async function deleteFund(id: string): Promise<void> {
   const db = getFirebaseDb()
   const records = await getDocs(
     query(collection(db, RECORDS), where('fundId', '==', id)),
   )
-  // Batched so a fund can never be left with orphaned records.
   for (let i = 0; i < records.docs.length; i += 499) {
     const batch = writeBatch(db)
     for (const r of records.docs.slice(i, i + 499)) batch.delete(r.ref)
@@ -166,8 +139,6 @@ export async function deleteFund(id: string): Promise<void> {
   }
   await deleteDoc(doc(db, FUNDS, id))
 }
-
-/* ---- Records -------------------------------------------------------------- */
 
 export async function listFundRecords(
   fundId: string,
@@ -185,24 +156,6 @@ export async function listFundRecords(
     )
 }
 
-/** Every contribution a person has made, newest first — for their profile. */
-export async function listPersonContributions(
-  personId: string,
-): Promise<ContributionRecord[]> {
-  const db = getFirebaseDb()
-  const snap = await getDocs(
-    query(collection(db, RECORDS), where('personId', '==', personId)),
-  )
-  return snap.docs
-    .map((s) => toRecord(s.id, s.data()))
-    .sort((a, b) => b.contributedOn.localeCompare(a.contributedOn))
-}
-
-/*
- * Recompute the fund's denormalised totals from its records. Called after every
- * record write; cheap because a fund's record count is bounded by congregation
- * size, and correct under concurrent edits in a way `increment()` is not.
- */
 async function refreshFundTotals(fundId: string): Promise<void> {
   const db = getFirebaseDb()
   const records = await listFundRecords(fundId)

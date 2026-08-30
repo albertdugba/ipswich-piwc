@@ -19,21 +19,6 @@ import {
 } from '@/domain/enums'
 import type { Person } from '@/domain/person'
 
-/*
- * The attendance register: a tally-from-the-roster surface, not a data grid.
- *
- * Design notes, because these are deliberate rather than incidental:
- *  - The whole row is the hit target (56px tall), so this works one-handed on a
- *    phone. A 16px checkbox is the wrong control for a task done standing up.
- *  - Present is a filled state on the row itself, not a tick in a column — you
- *    can see who is marked from arm's length while scrolling fast.
- *  - Rows are grouped by surname initial with a sticky A–Z rail, so a 200-person
- *    roster is two taps away from any name. No pagination: paging through a
- *    register loses your place.
- *  - Every tap saves immediately (see useTogglePresent). There is no Save button
- *    and therefore no way to lose a session's work.
- */
-
 export type StatusFilter = MembershipStatus | 'ALL'
 
 export interface AttendanceRosterProps {
@@ -41,17 +26,13 @@ export interface AttendanceRosterProps {
   presentIds: Set<string>
   isLoading?: boolean
   canWrite?: boolean
-  /** Marks/unmarks one person. Saved immediately by the caller. */
   onToggle: (personId: string, present: boolean) => void
-  /** Marks every currently-visible person present (respects search + filter). */
   onMarkVisible: (personIds: string[]) => void
-  /** Toolbar slot for the bulk-action menu. */
   actions?: React.ReactNode
 }
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('')
 
-/** Group key for a person — surname initial, non-letters bucketed under '#'. */
 function letterOf(person: Person) {
   const c = (person.lastName || person.firstName || '#').charAt(0).toUpperCase()
   return /[A-Z]/.test(c) ? c : '#'
@@ -83,8 +64,6 @@ export function AttendanceRoster({
     })
   }, [people, search, status, onlyUnmarked, presentIds])
 
-  // Sections are derived from the *visible* set so the A–Z rail only offers
-  // letters that actually exist right now.
   const sections = useMemo(() => {
     const map = new Map<string, Person[]>()
     for (const p of visible) {
@@ -109,7 +88,6 @@ export function AttendanceRoster({
 
   return (
     <div className="overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-foreground/10">
-      {/* Toolbar */}
       <div className="flex flex-col gap-3 border-b border-border p-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative w-full sm:max-w-xs">
@@ -163,7 +141,6 @@ export function AttendanceRoster({
           </div>
         </div>
 
-        {/* Second row: quick scoping + a bulk action that respects the filter. */}
         {canWrite ? (
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -193,7 +170,6 @@ export function AttendanceRoster({
         ) : null}
       </div>
 
-      {/* Roster */}
       <div className="relative flex">
         <div
           ref={scrollRef}
@@ -234,7 +210,6 @@ export function AttendanceRoster({
           )}
         </div>
 
-        {/* A–Z rail. Hidden on very small screens where the thumb covers it. */}
         {!isLoading && sections.length > 1 ? (
           <nav
             aria-label="Jump to letter"
@@ -266,11 +241,6 @@ export function AttendanceRoster({
   )
 }
 
-/*
- * One roster row. The <button> spans the full row so the target is the whole
- * 56px strip rather than a checkbox, and `aria-pressed` gives assistive tech the
- * same toggle semantics the visual state implies.
- */
 function RosterRow({
   person,
   present,
@@ -331,7 +301,6 @@ function RosterRow({
 
         <MembershipBadge status={person.membershipStatus} />
 
-        {/* Trailing state pip — reads as "marked" from a distance. */}
         <span
           aria-hidden
           className={cn(

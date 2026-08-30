@@ -5,11 +5,6 @@ import { HugeiconsIcon, MinistryIcon, StarIcon } from '@/lib/icons'
 import { useDepartments, usePersonDepartments } from './queries'
 import { departmentRoleLabels } from '@/domain/enums'
 
-/*
- * Shows every ministry a person belongs to (with their role) — the person-side
- * view of the many-to-many, used on the member profile. Demonstrates that one
- * Person can belong to multiple ministries.
- */
 export function PersonMinistries({ personId }: { personId: string }) {
   const memberships = usePersonDepartments(personId)
   const departments = useDepartments()

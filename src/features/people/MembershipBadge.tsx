@@ -1,8 +1,6 @@
 import { membershipStatusLabels, type MembershipStatus } from '@/domain/enums'
 import { cn } from '@/lib/utils'
 
-// Membership status → colour. Kept here (not in the generic Badge) because the
-// palette is domain-specific: members green, regulars blue, visitors amber.
 const styles: Record<MembershipStatus, string> = {
   MEMBER: 'bg-emerald-50 text-emerald-700',
   REGULAR_ATTENDEE: 'bg-sky-50 text-sky-700',

@@ -41,7 +41,6 @@ function MinistriesPage() {
   const peopleQuery = usePeople()
   const seed = useSeedDepartments()
 
-  // Per-department roster: member count, leader and a few members for avatars.
   const deptInfo = useMemo(() => {
     const peopleById = new Map<string, Person>(
       (peopleQuery.data ?? []).map((p) => [p.id, p]),

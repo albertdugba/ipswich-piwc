@@ -2,14 +2,6 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-/*
- * Multi-line text input, matching the Input primitive's border and focus
- * treatment (2px resting grey, brand blue on focus).
- *
- * Resizing is disabled: the drag handle lets a user break the layout of a
- * dialog for no real benefit, and every current use sets a sensible `rows`.
- * Pass `resizable` on the rare field where manual sizing genuinely helps.
- */
 function Textarea({
   className,
   rows = 3,

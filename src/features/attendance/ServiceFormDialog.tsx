@@ -22,10 +22,6 @@ import {
   type ServiceFormValues,
 } from '@/domain/service'
 
-/*
- * Create / edit a service (a datable gathering). Validated with Zod at submit;
- * owns the Firestore mutation. Parent controls `open`.
- */
 export function ServiceFormDialog({
   open,
   onOpenChange,

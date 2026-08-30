@@ -1,10 +1,3 @@
-/*
- * Mock dashboard data for the foundation phase. Shapes mirror what real domain
- * queries will return, so swapping this for live data later is a drop-in change
- * (Rule: analytics/dashboards derive from actual domain data — here it's faked
- * but typed the same way). Nothing here talks to the database.
- */
-
 export interface DashboardSummary {
   membership: {
     total: number
@@ -19,7 +12,6 @@ export interface DashboardSummary {
     latestCount: number
     average: number
     trendPct: number
-    /** Last 8 Sundays, oldest → newest. */
     weekly: { label: string; count: number }[]
   }
   birthdays: {

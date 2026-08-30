@@ -16,11 +16,6 @@ import {
 import type { DepartmentFormValues } from '@/domain/department'
 import type { DepartmentRole } from '@/domain/enums'
 
-/*
- * TanStack Query hooks over the Firestore departments/memberships data access,
- * mirroring the People module. Queries are disabled until Firebase is
- * configured so the app renders a "connect Firebase" state instead of erroring.
- */
 export const ministryKeys = {
   all: ['ministries'] as const,
   list: () => [...ministryKeys.all, 'list'] as const,
@@ -47,7 +42,6 @@ export function useDepartment(id: string) {
   })
 }
 
-/** All memberships — used to count members per department on the list. */
 export function useAllMemberships() {
   return useQuery({
     queryKey: ministryKeys.allMemberships(),

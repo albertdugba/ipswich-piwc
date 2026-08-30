@@ -1,5 +1,3 @@
-// Convenience barrel for the most-used UI pieces. shadcn/Base UI primitives can
-// also be imported directly from their own files (e.g. '@/components/ui/card').
 export {
   Card,
   CardHeader,
@@ -10,6 +8,7 @@ export {
   CardFooter,
 } from './card'
 export { Badge, badgeVariants } from './badge'
+export { Field, FieldGrid } from './field'
 export { Button, buttonVariants } from './button'
 export { Checkbox } from './checkbox'
 export {
@@ -36,4 +35,4 @@ export {
   TabsCount,
 } from './tabs'
 export { Textarea } from './textarea'
-export { DataTable, selectionColumn } from './data-table'
+export { DataTable } from './data-table'

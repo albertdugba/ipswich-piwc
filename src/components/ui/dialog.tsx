@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 
-// Hugeicons wrapper matching the shadcn close-button call site below.
 function XIcon({ className }: { className?: string }) {
   return <HugeiconsIcon icon={Cancel01Icon} className={className} />
 }
@@ -43,16 +42,6 @@ function DialogOverlay({
   )
 }
 
-/*
- * Layout contract: DialogContent is a fixed-height flex column that never
- * scrolls itself. Put scrollable form fields in <DialogBody> and actions in
- * <DialogFooter> so the header and the footer stay pinned.
- *
- * Below `sm` the dialog is a full-screen sheet that slides up from the bottom —
- * this app is used on phones far more than on desktop, and a centred card with
- * a tiny close target is miserable one-handed. From `sm` up it is the usual
- * centred card.
- */
 function DialogContent({
   className,
   children,
@@ -68,9 +57,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           'fixed z-50 flex flex-col overflow-hidden bg-popover text-sm text-popover-foreground outline-none',
-          // Mobile: full-screen sheet sliding up from the bottom edge.
           'inset-0 duration-200 data-open:animate-in data-open:slide-in-from-bottom-full data-closed:animate-out data-closed:slide-out-to-bottom-full',
-          // sm and up: centred card that fades and zooms.
           'sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[calc(100dvh-3rem)] sm:w-[calc(100%-2rem)] sm:max-w-sm sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl sm:shadow-lg sm:ring-1 sm:ring-foreground/10 sm:duration-100',
           'sm:data-open:fade-in-0 sm:data-open:zoom-in-95 sm:data-open:slide-in-from-bottom-0 sm:data-closed:fade-out-0 sm:data-closed:zoom-out-95 sm:data-closed:slide-out-to-bottom-0',
           className,
@@ -98,7 +85,6 @@ function DialogContent({
   )
 }
 
-/** Pinned title area. `pr-12` keeps the text clear of the close button. */
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -112,7 +98,6 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-/** The only scrollable region. Everything between the header and the footer. */
 function DialogBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -126,11 +111,6 @@ function DialogBody({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-/*
- * Pinned action bar. On mobile the buttons share the width equally so both are
- * comfortable thumb targets; from `sm` they collapse to the usual right-aligned
- * row.
- */
 function DialogFooter({
   className,
   showCloseButton = false,

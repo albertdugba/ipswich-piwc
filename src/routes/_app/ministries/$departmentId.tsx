@@ -215,7 +215,6 @@ function MinistryDetailPage() {
         />
       ) : (
         <>
-          {/* Header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
               <span className="flex size-12 items-center justify-center rounded-xl bg-brand-600 text-white ring-2 ring-gold-400">
@@ -255,7 +254,6 @@ function MinistryDetailPage() {
             ) : null}
           </div>
 
-          {/* Members */}
           <div>
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-medium text-foreground">

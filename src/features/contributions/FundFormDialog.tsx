@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Field, FieldGrid } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -39,17 +39,6 @@ import {
   type ContributionKind,
 } from '@/domain/enums'
 
-/*
- * Create / edit a contribution fund. The form is one shape with conditional
- * fields rather than four separate forms: `kind` decides which extra field is
- * required, and the Zod schema enforces that (a MINISTRY_DUES fund without a
- * department, or a BEREAVEMENT without a beneficiary, will not validate).
- *
- * Money is typed in pounds and stored in pence — the schema does the conversion,
- * so nothing here deals in floats.
- */
-
-/** Money fields round-trip through pounds for editing. */
 function poundsField(pence?: number | null) {
   return pence ? String(penceToPounds(pence)) : ''
 }
@@ -99,7 +88,6 @@ export function FundFormDialog({
               : 'Dues, a bereavement collection or a one-off appeal.'}
           </DialogDescription>
         </DialogHeader>
-        {/* Remount on target change so the form resets its state. */}
         <FundForm
           key={fund?.id ?? 'new'}
           fund={fund}
@@ -215,7 +203,6 @@ function FundForm({
           />
         </Field>
 
-        {/* Ministry dues restrict the roster to that ministry's members. */}
         {kind === 'MINISTRY_DUES' ? (
           <Field
             label="Ministry"
@@ -287,7 +274,7 @@ function FundForm({
           </>
         ) : null}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FieldGrid>
           {isDues ? (
             <Field
               label="Expected per member"
@@ -310,9 +297,9 @@ function FundForm({
               aria-invalid={Boolean(errors.targetAmount)}
             />
           </Field>
-        </div>
+        </FieldGrid>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FieldGrid>
           <Field label="From" error={errors.periodStart?.message}>
             <Input
               type="date"
@@ -327,7 +314,7 @@ function FundForm({
               aria-invalid={Boolean(errors.periodEnd)}
             />
           </Field>
-        </div>
+        </FieldGrid>
 
         <Field label="Notes" error={errors.notes?.message}>
           <Textarea {...register('notes')} rows={2} />
@@ -366,7 +353,6 @@ function FundForm({
   )
 }
 
-/** Pounds input with a £ adornment. Values are converted to pence by the schema. */
 function MoneyInput({
   className,
   ...props
@@ -386,35 +372,6 @@ function MoneyInput({
         className={`pl-7 ${className ?? ''}`}
         {...props}
       />
-    </div>
-  )
-}
-
-function Field({
-  label,
-  required,
-  error,
-  hint,
-  children,
-}: {
-  label: string
-  required?: boolean
-  error?: string
-  hint?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">
-        {label}
-        {required ? <span className="ml-0.5 text-destructive">*</span> : null}
-      </Label>
-      {children}
-      {error ? (
-        <p className="text-xs text-destructive">{error}</p>
-      ) : hint ? (
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      ) : null}
     </div>
   )
 }

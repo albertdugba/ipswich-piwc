@@ -12,16 +12,6 @@ import {
   useFirebaseEmulator,
 } from '@/lib/env.public'
 
-/*
- * Firebase Web SDK (client-only). Firebase is the whole backend for this app:
- * Cloud Firestore is the system of record for church data, plus Authentication,
- * Storage (profile photos/uploads) and Cloud Messaging.
- *
- * Everything is initialised lazily so importing this module has no side effects
- * and the app still builds/boots before a Firebase project is configured.
- * Cloud Messaging (getMessaging) is intentionally deferred — it is only
- * supported in the browser and is wired up when reminders/push land.
- */
 function firebaseConfig() {
   return {
     apiKey: clientEnv.VITE_FIREBASE_API_KEY,
@@ -42,16 +32,10 @@ export function getFirebaseApp(): FirebaseApp {
   return getApps().length ? getApp() : initializeApp(firebaseConfig())
 }
 
-// Cache the Firestore instance so we only initialise/connect once.
 let firestoreInstance: Firestore | null = null
 
 export function getFirebaseDb(): Firestore {
   if (firestoreInstance) return firestoreInstance
-  // Force long polling: Firestore's default WebChannel streaming transport is
-  // silently blocked/mangled by some proxies, VPNs, ad-blockers and browser
-  // extensions, which makes reads/writes hang forever even though requests
-  // return 200. Auto-detect can still misfire in those setups, so we force the
-  // reliable plain-HTTP long-polling transport outright.
   firestoreInstance = initializeFirestore(getFirebaseApp(), {
     experimentalForceLongPolling: true,
   })

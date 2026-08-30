@@ -11,31 +11,11 @@ import {
   Tick02Icon,
 } from '@hugeicons/core-free-icons'
 
-/*
- * Autocomplete / combobox built on Base UI, styled to match the Select and
- * Input primitives. Use this instead of <Select> whenever the option list is
- * long enough that a user would rather type than scroll (people, ministries…).
- *
- * Typical shape:
- *   <Combobox items={people} itemToStringLabel={displayName} value={p} onValueChange={setP}>
- *     <ComboboxInputGroup>
- *       <ComboboxInput placeholder="Search people…" />
- *       <ComboboxClear />
- *       <ComboboxTrigger />
- *     </ComboboxInputGroup>
- *     <ComboboxContent>
- *       <ComboboxEmpty>No matches.</ComboboxEmpty>
- *       <ComboboxList>{(p) => <ComboboxItem key={p.id} value={p}>…</ComboboxItem>}</ComboboxList>
- *     </ComboboxContent>
- *   </Combobox>
- */
-
 const Combobox = ComboboxPrimitive.Root
 const ComboboxValue = ComboboxPrimitive.Value
 const ComboboxCollection = ComboboxPrimitive.Collection
 const ComboboxRow = ComboboxPrimitive.Row
 
-/** The bordered field shell. Owns the focus ring so the inner input can be bare. */
 function ComboboxInputGroup({
   className,
   ...props
@@ -52,7 +32,6 @@ function ComboboxInputGroup({
   )
 }
 
-/** Optional leading magnifier. Purely decorative — clicks pass through to the input. */
 function ComboboxSearchIcon({ className }: { className?: string }) {
   return (
     <HugeiconsIcon
@@ -79,7 +58,6 @@ function ComboboxInput({ className, ...props }: ComboboxPrimitive.Input.Props) {
   )
 }
 
-/** Chevron button that toggles the popup. */
 function ComboboxTrigger({
   className,
   children,
@@ -108,7 +86,6 @@ function ComboboxTrigger({
   )
 }
 
-/** Clears the selection. Base UI only shows it when there is a value. */
 function ComboboxClear({
   className,
   children,
@@ -174,10 +151,6 @@ function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   )
 }
 
-/*
- * Base UI keeps Empty mounted so screen readers hear the change, so this always
- * renders an element — it just collapses to nothing when the list has items.
- */
 function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
   return (
     <ComboboxPrimitive.Empty

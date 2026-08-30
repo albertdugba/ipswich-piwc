@@ -1,12 +1,3 @@
-/*
- * Production Node runner for self-hosting.
- *
- * `pnpm build` emits a standard Web fetch handler at dist/server/server.js
- * (TanStack Start's default, platform-agnostic output). This thin wrapper
- * bridges that handler to node:http so the app can be run with `pnpm start` on
- * any Node host. For serverless/edge platforms, deploy dist/server/server.js
- * directly and delete this file from the deploy.
- */
 import { createServer } from 'node:http'
 import { Readable } from 'node:stream'
 import handler from './dist/server/server.js'
@@ -23,14 +14,11 @@ const server = createServer(async (req, res) => {
       method: req.method,
       headers: req.headers,
       body: hasBody ? Readable.toWeb(req) : undefined,
-      // Required by Node when streaming a request body.
       duplex: hasBody ? 'half' : undefined,
     })
 
     const response = await handler.fetch(request)
 
-    // Preserve multiple Set-Cookie headers (Headers collapses them otherwise);
-    // Node's writeHead accepts an array value for a header.
     const headers = Object.fromEntries(response.headers)
     const setCookies = response.headers.getSetCookie?.() ?? []
     if (setCookies.length) headers['set-cookie'] = setCookies

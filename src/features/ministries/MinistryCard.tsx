@@ -10,14 +10,6 @@ import { cn, displayName, initials } from '@/lib/utils'
 import type { Department } from '@/domain/department'
 import type { Person } from '@/domain/person'
 
-/*
- * Grid tile for a single ministry on /ministries. Reads as a small editorial
- * card: identity (icon + name + leader) up top, the department's own blurb in
- * the middle, and the roster summary in a footer. Rendered as a <Link> rather
- * than a button so middle-click / cmd-click open the detail page in a new tab.
- */
-
-// Beyond this the stack gets noisy; the remainder collapses into a "+N" chip.
 const MAX_AVATARS = 5
 
 export function MinistryCard({
@@ -88,7 +80,6 @@ export function MinistryCard({
         />
       </div>
 
-      {/* Blurb. Grows so every card in a row ends with an aligned footer. */}
       <div className="mt-4 flex-1">
         <p
           className={cn(

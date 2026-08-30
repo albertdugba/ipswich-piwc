@@ -11,11 +11,6 @@ import { useCreatePerson, useUpdatePerson } from './queries'
 import { displayName } from '@/lib/utils'
 import type { Person, PersonFormValues } from '@/domain/person'
 
-/*
- * Dialog that hosts the add/edit member form and owns the Firestore mutation.
- * The parent controls `open`; on success it closes and (via query invalidation
- * in the mutation hooks) the list/profile refetch.
- */
 export function PersonFormDialog({
   open,
   onOpenChange,
@@ -68,7 +63,6 @@ export function PersonFormDialog({
               : 'Add a new person to the church record. Only name is required.'}
           </DialogDescription>
         </DialogHeader>
-        {/* Remount on target change so the form resets its state. */}
         <PersonForm
           key={person?.id ?? 'new'}
           person={person}

@@ -1,12 +1,3 @@
-/*
- * Domain enums — the single source of truth for status values across the app.
- * These are plain TypeScript literal unions (no ORM); Firestore stores the
- * string values directly and Zod validates them at the boundaries.
- *
- * Ported from the original Drizzle schema when the data layer moved to
- * Cloud Firestore.
- */
-
 export const membershipStatusValues = [
   'VISITOR',
   'REGULAR_ATTENDEE',
@@ -60,11 +51,6 @@ export const departmentRoleLabels: Record<DepartmentRole, string> = {
   MEMBER: 'Member',
 }
 
-/*
- * What a contribution fund is FOR. This drives behaviour (a bereavement needs a
- * beneficiary, ministry dues are scoped to a department), so it is a closed
- * union rather than free-form data — the fund's `name` carries the specifics.
- */
 export const contributionKindValues = [
   'MONTHLY_DUES',
   'MINISTRY_DUES',
@@ -136,7 +122,6 @@ export const testimonyStatusValues = [
 ] as const
 export type TestimonyStatus = (typeof testimonyStatusValues)[number]
 
-// Roles map to the permission matrix in src/lib/auth/permissions.ts.
 export const appRoleValues = [
   'SUPER_ADMIN',
   'PASTOR',

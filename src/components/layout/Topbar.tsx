@@ -27,17 +27,11 @@ const ROLE_LABELS: Record<string, string> = {
   MEMBER: 'Member',
 }
 
-/*
- * Shopify-style dark top bar spanning the full width above the sidebar: brand
- * on the left, a centred search, and notifications + user on the right. On
- * small screens a hamburger opens the navigation in a drawer.
- */
 export function Topbar({ user }: { user: AuthUser }) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 bg-neutral-900 px-3 text-white sm:gap-4">
-      {/* Mobile menu */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetTrigger
           aria-label="Open menu"
@@ -51,7 +45,6 @@ export function Topbar({ user }: { user: AuthUser }) {
         </SheetContent>
       </Sheet>
 
-      {/* Brand */}
       <Link
         to="/dashboard"
         className="flex items-center gap-2.5 sm:w-[13.75rem]"
@@ -64,7 +57,6 @@ export function Topbar({ user }: { user: AuthUser }) {
         </span>
       </Link>
 
-      {/* Search */}
       <div className="flex flex-1 justify-center">
         <div className="relative w-full max-w-xl">
           <HugeiconsIcon
@@ -83,7 +75,6 @@ export function Topbar({ user }: { user: AuthUser }) {
         </div>
       </div>
 
-      {/* Actions */}
       <div className="flex items-center gap-1">
         <button
           type="button"

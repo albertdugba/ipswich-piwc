@@ -5,12 +5,6 @@ import { NAV_ITEMS, type NavItem } from '@/lib/navigation'
 import { hasPermission } from '@/lib/auth/permissions'
 import type { AuthUser } from '@/lib/auth/session'
 
-/*
- * Shopify-style left navigation: a light-grey rail with white "pill" active
- * states, small section headers and Settings pinned to the bottom. Items are
- * filtered against the current user's permissions (the rail itself holds no
- * role logic). `SidebarNav` is shared by the desktop rail and the mobile drawer.
- */
 export function Sidebar({ user }: { user: AuthUser }) {
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-neutral-200 bg-neutral-100 md:flex">

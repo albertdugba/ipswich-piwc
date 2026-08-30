@@ -9,15 +9,6 @@ import {
 import { getAuth, type Auth } from 'firebase-admin/auth'
 import { serverEnv } from '@/lib/env.server'
 
-/*
- * Firebase Admin SDK (SERVER ONLY — never import into client code). Used to
- * verify Firebase ID tokens / session cookies when real auth is wired up
- * (see src/lib/auth/session.ts).
- *
- * Credentials come from FIREBASE_SERVICE_ACCOUNT (single-line JSON) or, failing
- * that, GOOGLE_APPLICATION_CREDENTIALS via applicationDefault(). Initialised
- * lazily so the app boots without Firebase configured during this phase.
- */
 let cachedApp: App | null = null
 
 function getAdminApp(): App {

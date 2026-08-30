@@ -16,11 +16,6 @@ import {
 } from '@/features/dashboard/components'
 import { dashboardMock } from '@/features/dashboard/mock-data'
 
-/*
- * The dashboard answers "what do I need to know about the church today?".
- * It currently renders MOCK data (foundation phase); each card is shaped to
- * accept the same data a real loader will provide later.
- */
 export const Route = createFileRoute('/_app/dashboard')({
   loader: () => ({ summary: dashboardMock }),
   component: DashboardPage,
@@ -37,7 +32,6 @@ function DashboardPage() {
         description="Here’s what’s happening at Ipswich PIWC today."
       />
 
-      {/* Membership KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total members"
@@ -65,7 +59,6 @@ function DashboardPage() {
         />
       </div>
 
-      {/* Attendance + needs attention */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <AttendanceTrendCard data={summary.attendance} />
@@ -73,13 +66,11 @@ function DashboardPage() {
         <NeedsAttentionCard data={summary.needsAttention} />
       </div>
 
-      {/* Reminders */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <BirthdaysCard data={summary.birthdays} />
         <AnniversariesCard data={summary.anniversaries} />
       </div>
 
-      {/* Ministries + activity */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <MinistryBreakdownCard data={summary.ministries} />
         <RecentActivityCard data={summary.recentActivity} />

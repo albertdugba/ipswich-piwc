@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Tick02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons'
 
-// Hugeicons wrappers matching the shadcn icon call sites in this file.
 function CheckIcon({ className }: { className?: string }) {
   return <HugeiconsIcon icon={Tick02Icon} className={className} />
 }

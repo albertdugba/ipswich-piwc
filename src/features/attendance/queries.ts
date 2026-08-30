@@ -14,11 +14,6 @@ import {
 } from '@/lib/firestore/attendance'
 import type { ServiceFormValues } from '@/domain/service'
 
-/*
- * TanStack Query hooks over the Firestore attendance data access, mirroring the
- * People and Ministries modules. Queries are disabled until Firebase is
- * configured.
- */
 export const attendanceKeys = {
   all: ['attendance'] as const,
   services: () => [...attendanceKeys.all, 'services'] as const,
@@ -86,7 +81,6 @@ export function useDeleteService() {
   })
 }
 
-/** Whoever attended the service before this one — powers "copy from last service". */
 export function usePreviousServicePresent(serviceId: string) {
   return useQuery({
     queryKey: attendanceKeys.previous(serviceId),
@@ -95,11 +89,6 @@ export function usePreviousServicePresent(serviceId: string) {
   })
 }
 
-/*
- * Mark one person present/absent, applied optimistically so the row responds
- * instantly and the register stays usable on a poor church-hall connection. On
- * failure the previous list is rolled back and the caller can surface an undo.
- */
 export function useTogglePresent() {
   const qc = useQueryClient()
   return useMutation({
@@ -133,8 +122,6 @@ export function useTogglePresent() {
       if (context?.previous) qc.setQueryData(context.key, context.previous)
     },
 
-    // Refresh the service doc so the header's presentCount catches up, but leave
-    // the present list alone — the optimistic value is already correct.
     onSettled: (_data, _err, { serviceId }) => {
       void qc.invalidateQueries({ queryKey: attendanceKeys.service(serviceId) })
       void qc.invalidateQueries({ queryKey: attendanceKeys.services() })
@@ -142,11 +129,6 @@ export function useTogglePresent() {
   })
 }
 
-/*
- * Replace the whole present set in one batched write. Used by the bulk actions
- * (mark filtered, mark a ministry, copy from last service) where a per-person
- * loop would mean hundreds of round trips.
- */
 export function useSaveAttendance() {
   const qc = useQueryClient()
   return useMutation({

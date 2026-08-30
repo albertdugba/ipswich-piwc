@@ -16,24 +16,13 @@ import { penceToPounds, type ContributionRecord } from '@/domain/contribution'
 import { cn, displayName, formatDate, formatGBP, initials } from '@/lib/utils'
 import type { Person } from '@/domain/person'
 
-/*
- * Who has contributed to a fund — and, when the fund sets an expected amount,
- * who still owes. This is the chasing surface: the default filter is "unpaid",
- * because the useful question is almost never "who paid?" but "who hasn't?".
- *
- * A person can appear with several payments (instalments), so each row shows
- * their running total and expands to the individual records.
- */
-
 type PayState = 'PAID' | 'PART' | 'UNPAID'
 type Filter = 'ALL' | PayState
 
 export interface ContributorRosterProps {
   people: Person[]
   records: ContributionRecord[]
-  /** personId → total given, in pence. */
   givenByPerson: Map<string, number>
-  /** Pence expected from each person, or null when the fund has no target. */
   expectedPerPerson: number | null
   canSeeAmounts?: boolean
   canWrite?: boolean
@@ -117,7 +106,6 @@ export function ContributorRoster({
       label: tracksDues ? 'Paid' : 'Given',
       count: counts.PAID,
     },
-    // Part-paid only makes sense when the fund sets an expected amount.
     ...(tracksDues
       ? [{ value: 'PART' as Filter, label: 'Part-paid', count: counts.PART }]
       : []),
@@ -259,7 +247,6 @@ export function ContributorRoster({
                   ) : null}
                 </div>
 
-                {/* Individual payments, so an instalment can be corrected. */}
                 {isOpen && personRecords.length > 0 ? (
                   <ul className="border-t border-border/60 bg-muted/30 px-4 py-2">
                     {personRecords.map((r) => (

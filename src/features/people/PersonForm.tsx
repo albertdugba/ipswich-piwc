@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { Controller, useForm, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -17,8 +17,8 @@ import {
 } from '@/domain/person'
 import type { Person } from '@/domain/person'
 import { Input } from '@/components/ui/input'
+import { Field, FieldGrid } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DialogBody, DialogFooter } from '@/components/ui/dialog'
@@ -33,22 +33,11 @@ import { HugeiconsIcon, LocationIcon } from '@/lib/icons'
 import { lookupPostcode } from '@/lib/postcode'
 import { cn } from '@/lib/utils'
 
-/*
- * Add / edit member form, driven by react-hook-form with the domain Zod schema
- * as the single source of validation truth (Rule 8 — validate at the boundary).
- *
- * The form is typed on `PersonFormInput` (what the inputs hold while editing, so
- * `''` is legal for an optional field) and `handleSubmit` hands `onSubmit` the
- * parsed `PersonFormValues`, with empties already trimmed to `undefined`. That
- * means no manual coercion here and no second copy of the rules.
- */
-
 function toDefaults(person?: Person): PersonFormInput {
   return {
     firstName: person?.firstName ?? '',
     lastName: person?.lastName ?? '',
     preferredName: person?.preferredName ?? '',
-    // Enum fields must be `undefined` when unset — '' is not a member of the enum.
     gender: person?.gender ?? undefined,
     dateOfBirth: person?.dateOfBirth ?? '',
     phone: person?.phone ?? '',
@@ -92,7 +81,6 @@ export function PersonForm({
   } = useForm<PersonFormInput, unknown, PersonFormValues>({
     resolver: zodResolver(personFormSchema),
     defaultValues: toDefaults(person),
-    // Stay quiet until a field has been visited, then correct in real time.
     mode: 'onTouched',
   })
 
@@ -194,8 +182,6 @@ export function PersonForm({
           </Field>
         </FieldGrid>
 
-        {/* Address — enter a postcode and press Find to validate it and
-            auto-fill the town, then type the house number & street. */}
         <Controller
           control={control}
           name="postcode"
@@ -290,37 +276,6 @@ export function PersonForm({
   )
 }
 
-function FieldGrid({ children }: { children: ReactNode }) {
-  return <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{children}</div>
-}
-
-function Field({
-  label,
-  required,
-  error,
-  children,
-}: {
-  label: string
-  required?: boolean
-  error?: string
-  children: ReactNode
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">
-        {label}
-        {required ? <span className="ml-0.5 text-destructive">*</span> : null}
-      </Label>
-      {children}
-      {error ? <p className="text-xs text-destructive">{error}</p> : null}
-    </div>
-  )
-}
-
-/*
- * Base UI's Select isn't a native input, so it's wired through Controller. An
- * unset optional enum is `undefined` in form state and `null` to the Select.
- */
 function EnumSelect<
   Name extends 'gender' | 'maritalStatus' | 'membershipStatus',
 >({
@@ -371,11 +326,6 @@ function EnumSelect<
   )
 }
 
-/*
- * Postcode field with a free postcodes.io lookup: validates the postcode and
- * auto-fills the town. (postcodes.io is not PAF, so it can't list houses — the
- * person types the street themselves.)
- */
 function PostcodeLookup({
   value,
   onChange,

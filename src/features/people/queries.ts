@@ -9,12 +9,6 @@ import {
 } from '@/lib/firestore/people'
 import type { PersonFormValues } from '@/domain/person'
 
-/*
- * TanStack Query hooks over the Firestore people data access. Data is fetched
- * client-side (the queries are disabled until Firebase is configured, so the
- * app renders cleanly before a project is connected). Mutations invalidate the
- * list + affected detail so the UI stays in sync.
- */
 export const peopleKeys = {
   all: ['people'] as const,
   list: () => [...peopleKeys.all, 'list'] as const,

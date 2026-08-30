@@ -8,7 +8,6 @@ import {
   useReactTable,
   type ColumnDef,
   type OnChangeFn,
-  type RowData,
   type RowSelectionState,
   type SortingState,
 } from '@tanstack/react-table'
@@ -29,25 +28,9 @@ import {
 } from './table'
 import { Input } from './input'
 import { Button } from './button'
-import { Checkbox } from './checkbox'
 import { Skeleton } from './skeleton'
 import { HugeiconsIcon, SearchIcon, CloseIcon, InboxIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-
-/*
- * Allow columns to carry presentation hints, applied to both the header cell
- * and the body cells. `align` saves every feature hand-rolling text-right, and
- * `nowrap` is opt-in because the default should be to let long values wrap
- * rather than force the whole table into horizontal scroll.
- */
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
-    className?: string
-    align?: 'left' | 'center' | 'right'
-    nowrap?: boolean
-  }
-}
 
 const alignClass = {
   left: 'text-left',
@@ -55,35 +38,21 @@ const alignClass = {
   right: 'text-right',
 } as const
 
-/*
- * Reusable data table built on TanStack Table (v8). Search, sorting, optional
- * row selection and optional pagination are wrapped in one card: a toolbar
- * (search + filters), the table, and a footer (result count + pager). Column
- * definitions are provided by each feature.
- */
 export interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[]
   data: TData[]
   getRowId?: (row: TData) => string
   isLoading?: boolean
   loadingLabel?: string
-  /** Shown when there are no rows at all (not a filtered-empty result). */
   emptyState?: ReactNode
-  /** Render a global search box in the toolbar. */
   searchable?: boolean
   searchPlaceholder?: string
-  /** Extra controls rendered on the toolbar row (e.g. a status filter). */
   toolbar?: ReactNode
-  /** Singular/plural noun for the footer count, e.g. ['member','members']. */
   rowNoun?: [string, string]
-  /** Make rows clickable. Cells with their own controls should stopPropagation. */
   onRowClick?: (row: TData) => void
-  /** Controlled row selection (checkbox column via `selectionColumn`). */
   rowSelection?: RowSelectionState
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
-  /** Actions shown in place of the toolbar while rows are selected. */
   selectionActions?: ReactNode
-  /** Enable pagination with this page size (omit to show all rows). */
   pageSize?: number
 }
 
@@ -132,9 +101,6 @@ export function DataTable<TData>({
       : {}),
   })
 
-  // Only bail out to a caller-supplied empty state for a genuinely empty data
-  // set. A filtered-to-nothing result stays inside the table so the search box
-  // and filters remain reachable.
   if (!isLoading && data.length === 0 && emptyState) return <>{emptyState}</>
 
   const rows = table.getRowModel().rows
@@ -156,8 +122,6 @@ export function DataTable<TData>({
       {showToolbar ? (
         <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:items-center">
           {selectedCount > 0 ? (
-            /* Selection takes over the toolbar so the count and its actions
-               sit together instead of competing with search. */
             <div className="flex w-full items-center gap-3">
               <span className="text-sm font-medium text-foreground">
                 {selectedCount} selected
@@ -244,8 +208,6 @@ export function DataTable<TData>({
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                        {/* Always rendered, so sortable columns advertise
-                            themselves without needing a hover to discover. */}
                         <HugeiconsIcon
                           icon={
                             sorted === 'asc'
@@ -379,11 +341,6 @@ export function DataTable<TData>({
   )
 }
 
-/*
- * Placeholder rows while data loads. Keeping the table chrome mounted (rather
- * than swapping in a centred spinner) means the toolbar stays usable and the
- * layout doesn't jump when the real rows arrive.
- */
 function SkeletonRows({
   columns,
   rows,
@@ -401,7 +358,6 @@ function SkeletonRows({
             <TableCell key={c}>
               <Skeleton
                 className="h-4"
-                // Staggered widths read as text rather than as a solid block.
                 style={{ width: `${[70, 45, 60, 55, 35, 25][c % 6]}%` }}
               />
               {r === 0 && c === 0 ? (
@@ -415,35 +371,4 @@ function SkeletonRows({
       ))}
     </>
   )
-}
-
-/* ---- Selection column helper ---------------------------------------------- */
-
-export function selectionColumn<TData>(): ColumnDef<TData, unknown> {
-  return {
-    id: 'select',
-    enableSorting: false,
-    meta: { className: 'w-10' },
-    header: ({ table }) => (
-      <Checkbox
-        aria-label="Select all"
-        checked={table.getIsAllPageRowsSelected()}
-        indeterminate={
-          table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
-        }
-        onCheckedChange={(checked) =>
-          table.toggleAllPageRowsSelected(checked === true)
-        }
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        checked={row.getIsSelected()}
-        disabled={!row.getCanSelect()}
-        onClick={(e) => e.stopPropagation()}
-        onCheckedChange={(checked) => row.toggleSelected(checked === true)}
-      />
-    ),
-  }
 }

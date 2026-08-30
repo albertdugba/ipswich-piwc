@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Field, FieldGrid } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -39,18 +39,12 @@ import {
 import { AlertIcon, HugeiconsIcon } from '@/lib/icons'
 import type { Person } from '@/domain/person'
 
-/*
- * Record (or edit) one contribution against a fund. A person may appear here
- * more than once — instalments and repeat giving are both normal, so this
- * always creates a new record rather than replacing a person's previous one.
- */
 export function RecordContributionDialog({
   open,
   onOpenChange,
   fundId,
   people,
   record,
-  /** Preselected contributor, e.g. when opened from a roster row. */
   person,
   recordedById,
 }: {
@@ -89,7 +83,6 @@ export function RecordContributionDialog({
     mode: 'onTouched',
   })
 
-  // Start each visit from a clean slate rather than the last attempt's values.
   useEffect(() => {
     if (!open) return
     reset({
@@ -151,7 +144,7 @@ export function RecordContributionDialog({
               />
             </Field>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FieldGrid>
               <Field label="Amount" required error={errors.amount?.message}>
                 <div className="relative">
                   <span
@@ -182,7 +175,7 @@ export function RecordContributionDialog({
                   aria-invalid={Boolean(errors.contributedOn)}
                 />
               </Field>
-            </div>
+            </FieldGrid>
 
             <Field label="Method" error={errors.method?.message}>
               <Controller
@@ -255,28 +248,5 @@ export function RecordContributionDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
-
-function Field({
-  label,
-  required,
-  error,
-  children,
-}: {
-  label: string
-  required?: boolean
-  error?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">
-        {label}
-        {required ? <span className="ml-0.5 text-destructive">*</span> : null}
-      </Label>
-      {children}
-      {error ? <p className="text-xs text-destructive">{error}</p> : null}
-    </div>
   )
 }

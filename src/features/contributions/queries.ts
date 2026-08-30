@@ -8,7 +8,6 @@ import {
   getFund,
   listFundRecords,
   listFunds,
-  listPersonContributions,
   updateFund,
   updateRecord,
 } from '@/lib/firestore/contributions'
@@ -17,19 +16,12 @@ import type {
   ContributionRecordFormValues,
 } from '@/domain/contribution'
 
-/*
- * TanStack Query hooks over the contributions data access, mirroring the People,
- * Ministries and Attendance modules. Queries are disabled until Firebase is
- * configured so the app shows a "connect Firebase" state instead of erroring.
- */
 export const contributionKeys = {
   all: ['contributions'] as const,
   funds: () => [...contributionKeys.all, 'funds'] as const,
   fund: (id: string) => [...contributionKeys.all, 'fund', id] as const,
   records: (fundId: string) =>
     [...contributionKeys.all, 'records', fundId] as const,
-  person: (personId: string) =>
-    [...contributionKeys.all, 'person', personId] as const,
 }
 
 export function useFunds() {
@@ -53,14 +45,6 @@ export function useFundRecords(fundId: string) {
     queryKey: contributionKeys.records(fundId),
     queryFn: () => listFundRecords(fundId),
     enabled: isFirebaseConfigured && Boolean(fundId),
-  })
-}
-
-export function usePersonContributions(personId: string) {
-  return useQuery({
-    queryKey: contributionKeys.person(personId),
-    queryFn: () => listPersonContributions(personId),
-    enabled: isFirebaseConfigured && Boolean(personId),
   })
 }
 

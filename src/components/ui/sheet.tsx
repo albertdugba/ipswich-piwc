@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 
-// Hugeicons wrapper matching the shadcn close-button call site below.
 function XIcon({ className }: { className?: string }) {
   return <HugeiconsIcon icon={Cancel01Icon} className={className} />
 }

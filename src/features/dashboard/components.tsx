@@ -20,7 +20,6 @@ import {
 import { cn } from '@/lib/utils'
 import type { DashboardSummary } from './mock-data'
 
-/* ---- Attendance trend (simple, dependency-free bar chart) ----------------- */
 export function AttendanceTrendCard({
   data,
 }: {
@@ -76,7 +75,6 @@ export function AttendanceTrendCard({
   )
 }
 
-/* ---- Birthdays ------------------------------------------------------------ */
 export function BirthdaysCard({
   data,
 }: {
@@ -153,7 +151,6 @@ export function BirthdaysCard({
   )
 }
 
-/* ---- Marriage anniversaries ---------------------------------------------- */
 export function AnniversariesCard({
   data,
 }: {
@@ -205,7 +202,6 @@ export function AnniversariesCard({
   )
 }
 
-/* ---- Needs attention ------------------------------------------------------ */
 export function NeedsAttentionCard({
   data,
 }: {
@@ -290,7 +286,6 @@ function AttentionRow({
   )
 }
 
-/* ---- Ministry breakdown --------------------------------------------------- */
 export function MinistryBreakdownCard({
   data,
 }: {
@@ -325,7 +320,6 @@ export function MinistryBreakdownCard({
   )
 }
 
-/* ---- Recent activity ------------------------------------------------------ */
 const activityIcon: Record<
   DashboardSummary['recentActivity'][number]['type'],
   IconSvgElement

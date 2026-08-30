@@ -2,11 +2,6 @@ import type { ReactNode } from 'react'
 import { AlertIcon, HugeiconsIcon, InboxIcon, SpinnerIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-/*
- * Standard loading / empty / error presentations. Every module is expected to
- * use these so the app has consistent states (Rule 10).
- */
-
 export function LoadingState({
   label = 'Loading…',
   className,

@@ -66,10 +66,6 @@ function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   )
 }
 
-/*
- * Header labels are sentence case and muted rather than uppercase brand blue —
- * the chrome should recede so the rows themselves are what you scan.
- */
 function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
   return (
     <th

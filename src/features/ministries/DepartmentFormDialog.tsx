@@ -22,10 +22,6 @@ import {
   type DepartmentFormValues,
 } from '@/domain/department'
 
-/*
- * Create / edit a ministry. Validated with Zod at submit (Rule 8) and owns the
- * Firestore mutation; parent controls `open`.
- */
 export function DepartmentFormDialog({
   open,
   onOpenChange,

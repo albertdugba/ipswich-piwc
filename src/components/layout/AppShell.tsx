@@ -3,11 +3,6 @@ import type { AuthUser } from '@/lib/auth/session'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 
-/*
- * The authenticated application frame, Shopify-style: a full-screen layout with
- * a fixed dark top bar and an independently scrolling sidebar + content area.
- * No rounded outer frame — it fills the whole screen edge to edge.
- */
 export function AppShell({
   user,
   children,

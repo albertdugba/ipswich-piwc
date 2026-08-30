@@ -13,19 +13,8 @@ import {
 import { getFirebaseDb } from '@/lib/firebase/client'
 import type { Person, PersonFormValues } from '@/domain/person'
 
-/*
- * People data access — Cloud Firestore (client Web SDK). This is the system of
- * record for the central Person entity. Keeping all Firestore reads/writes in
- * this module (rather than in components) preserves the separation between data
- * access and presentation.
- *
- * Collection: `people`. See firestore.rules for access control.
- */
 const COLLECTION = 'people'
 
-/** Build a Firestore document from validated form values.
- *  Optional empties are written as `null` (never `undefined`, which Firestore
- *  rejects) so a field can also be cleared on update. */
 function toDocData(values: PersonFormValues) {
   return {
     firstName: values.firstName,
@@ -49,7 +38,6 @@ function toDocData(values: PersonFormValues) {
   }
 }
 
-/** Map a Firestore document + id into a typed Person. */
 function toPerson(id: string, d: DocumentData): Person {
   return {
     id,
@@ -77,8 +65,6 @@ function toPerson(id: string, d: DocumentData): Person {
   }
 }
 
-/** All people, ordered by last name. Secondary sort by first name is done in
- *  memory to avoid requiring a composite Firestore index. */
 export async function listPeople(): Promise<Person[]> {
   const db = getFirebaseDb()
   const snap = await getDocs(

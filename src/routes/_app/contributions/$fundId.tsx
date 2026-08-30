@@ -83,10 +83,6 @@ function FundDetailPage() {
   const records = recordsQuery.data ?? NO_RECORDS
   const allPeople = peopleQuery.data ?? NO_PEOPLE
 
-  /*
-   * Ministry dues only concern that ministry's members, so the roster is
-   * narrowed by departmentMemberships. Every other kind is church-wide.
-   */
   const eligible = useMemo(() => {
     if (!fund?.departmentId) return allPeople
     const ids = new Set(
@@ -97,10 +93,6 @@ function FundDetailPage() {
     return allPeople.filter((p) => ids.has(p.id))
   }, [fund?.departmentId, allPeople, membershipsQuery.data])
 
-  /*
-   * Every figure on this page comes from one pure function so the numbers can
-   * never disagree with each other — see summariseFund's tests.
-   */
   const summary = useMemo(
     () =>
       summariseFund(
@@ -161,7 +153,6 @@ function FundDetailPage() {
         />
       ) : (
         <>
-          {/* Header */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <span
@@ -216,7 +207,6 @@ function FundDetailPage() {
             ) : null}
           </div>
 
-          {/* Who this is for — bereavement collections are about a person. */}
           {fund.kind === 'BEREAVEMENT' && beneficiary ? (
             <div className="flex items-center gap-3 rounded-xl bg-gold-50 p-4 ring-1 ring-gold-200">
               <HugeiconsIcon
@@ -243,7 +233,6 @@ function FundDetailPage() {
             </div>
           ) : null}
 
-          {/* Summary */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {canSeeAmounts ? (
               <Stat
@@ -252,7 +241,6 @@ function FundDetailPage() {
                 emphasis
               />
             ) : null}
-            {/* Numerator is roster members only, so this can never read "5 / 4". */}
             <Stat
               label="Contributors"
               value={`${summary.rosterContributorCount} / ${summary.rosterSize}`}
@@ -291,11 +279,6 @@ function FundDetailPage() {
             </div>
           ) : null}
 
-          {/*
-            Money recorded against someone who is no longer on this roster still
-            counts towards the total, so it is called out rather than left as an
-            unexplained gap between "Raised" and the rows below.
-          */}
           {summary.offRoster.count > 0 ? (
             <p className="flex items-start gap-2 rounded-xl bg-gold-50 px-4 py-3 text-sm text-foreground ring-1 ring-gold-200">
               <HugeiconsIcon
@@ -317,7 +300,6 @@ function FundDetailPage() {
             </p>
           ) : null}
 
-          {/* Roster */}
           <div>
             <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-base font-medium text-foreground">

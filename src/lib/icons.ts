@@ -1,13 +1,7 @@
-/*
- * Central icon registry. The app uses Hugeicons (not Lucide). Components import
- * semantic names from here and render them with <HugeiconsIcon icon={...} />, so
- * swapping an icon is a one-line change in this file.
- */
 export { HugeiconsIcon } from '@hugeicons/react'
 export type { IconSvgElement } from '@hugeicons/react'
 
 export {
-  // Navigation / modules
   DashboardSquare01Icon as DashboardIcon,
   UserGroupIcon as MembersIcon,
   UserAdd01Icon as VisitorIcon,
@@ -19,13 +13,11 @@ export {
   Comment01Icon as TestimonyIcon,
   Analytics01Icon as AnalyticsIcon,
   Settings01Icon as SettingsIcon,
-  // Chrome
   Search01Icon as SearchIcon,
   Menu01Icon as MenuIcon,
   Notification03Icon as BellIcon,
   ChurchIcon,
   Compass01Icon as CompassIcon,
-  // Dashboard & states
   BirthdayCakeIcon as BirthdayIcon,
   FavouriteIcon as AnniversaryIcon,
   Alert02Icon as AlertIcon,
@@ -36,7 +28,6 @@ export {
   UserIcon,
   UserCheck01Icon,
   CalendarAdd01Icon as ActivityCalendarIcon,
-  // Actions & profile
   Add01Icon as AddIcon,
   PencilEdit02Icon as EditIcon,
   Delete02Icon as DeleteIcon,
@@ -48,7 +39,6 @@ export {
   Calendar03Icon as CalendarIcon,
   ArrowLeft01Icon as BackIcon,
   UserCircleIcon,
-  // Primitive internals (dropdown, sheet, etc.)
   Tick02Icon as CheckIcon,
   ArrowRight01Icon as ChevronRightIcon,
   Cancel01Icon as CloseIcon,

@@ -19,23 +19,10 @@ const buttonVariants = cva(
           'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
         link: 'text-primary underline-offset-4 hover:underline',
       },
-      /*
-       * `default` and `icon` are 40px to line up with Input / Select / Textarea,
-       * so a button next to a field shares its baseline. App code should use
-       * those two everywhere — the smaller steps exist for dense chrome inside
-       * other primitives (button groups, toolbars) and are not for page UI.
-       */
       size: {
         default:
           'h-10 gap-1.5 px-4 has-data-[icon=inline-end]:pr-3.5 has-data-[icon=inline-start]:pl-3.5',
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1 rounded-lg px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-11 gap-2 px-5 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4',
         icon: 'size-10',
-        'icon-xs':
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        'icon-sm': 'size-8 rounded-lg in-data-[slot=button-group]:rounded-lg',
-        'icon-lg': 'size-11',
       },
     },
     defaultVariants: {

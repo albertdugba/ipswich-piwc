@@ -21,16 +21,6 @@ import type {
   ServiceFormValues,
 } from '@/domain/service'
 
-/*
- * Attendance data access (Cloud Firestore, client Web SDK). Present-only model:
- * an attendanceRecords doc exists iff the person was present at that service.
- * The service's `presentCount` is kept in sync on save so lists/summaries read
- * cheaply.
- *
- * Collections:
- *   services
- *   attendanceRecords   (id `${serviceId}__${personId}`)
- */
 const SERVICES = 'services'
 const RECORDS = 'attendanceRecords'
 
@@ -57,9 +47,6 @@ function toRecord(id: string, d: DocumentData): AttendanceRecord {
   }
 }
 
-/* ---- Services ------------------------------------------------------------- */
-
-/** Services, most recent first. */
 export async function listServices(): Promise<Service[]> {
   const db = getFirebaseDb()
   const snap = await getDocs(
@@ -100,7 +87,6 @@ export async function updateService(
   })
 }
 
-/** Delete a service and all its attendance records. */
 export async function deleteService(id: string): Promise<void> {
   const db = getFirebaseDb()
   const records = await getDocs(
@@ -110,9 +96,6 @@ export async function deleteService(id: string): Promise<void> {
   await deleteDoc(doc(db, SERVICES, id))
 }
 
-/* ---- Attendance records --------------------------------------------------- */
-
-/** Person IDs marked present at a service. */
 export async function listServicePresentIds(
   serviceId: string,
 ): Promise<string[]> {
@@ -123,7 +106,6 @@ export async function listServicePresentIds(
   return snap.docs.map((s) => toRecord(s.id, s.data()).personId)
 }
 
-/** Every service a person attended (present). */
 export async function listPersonAttendance(
   personId: string,
 ): Promise<string[]> {
@@ -134,15 +116,6 @@ export async function listPersonAttendance(
   return snap.docs.map((s) => toRecord(s.id, s.data()).serviceId)
 }
 
-/*
- * Mark one person present or absent. Attendance is saved per tap rather than
- * batched behind a Save button — the deterministic record id makes each toggle a
- * single idempotent write, so a dropped connection or a closed tab can never
- * lose a session's work.
- *
- * `presentCount` is recomputed from the records rather than incremented, so it
- * cannot drift if two people mark the register at once.
- */
 export async function setPersonPresent(
   serviceId: string,
   personId: string,
@@ -167,17 +140,8 @@ export async function setPersonPresent(
   await updateDoc(doc(db, SERVICES, serviceId), { presentCount: count })
 }
 
-// Firestore caps a batch at 500 operations; we reserve one for the service doc.
 const BATCH_LIMIT = 499
 
-/**
- * Persist the set of present people for a service: add records for newly
- * present people, remove records for those no longer present, and keep the
- * service's presentCount in sync.
- *
- * Uses batched writes so a partial failure can't leave `presentCount`
- * disagreeing with the records it summarises.
- */
 export async function saveServiceAttendance(
   serviceId: string,
   presentPersonIds: string[],
@@ -212,23 +176,17 @@ export async function saveServiceAttendance(
         batch.delete(ref)
       }
     }
-    // Fold the count into the final chunk so it lands with the last writes.
     if (i + BATCH_LIMIT >= ops.length) {
       batch.update(doc(db, SERVICES, serviceId), { presentCount: next.size })
     }
     await batch.commit()
   }
 
-  // No record changes, but the count may still be stale (e.g. a repaired roster).
   if (ops.length === 0) {
     await updateDoc(doc(db, SERVICES, serviceId), { presentCount: next.size })
   }
 }
 
-/**
- * The people present at the most recent service before this one — the basis for
- * "copy from last service", which gets a typical Sunday 90% marked in one tap.
- */
 export async function listPreviousServicePresentIds(
   serviceId: string,
 ): Promise<{ service: Service; personIds: string[] } | null> {

@@ -130,7 +130,6 @@ function ProfileView({
 
   return (
     <>
-      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <span className="flex size-14 items-center justify-center rounded-full bg-brand-600 text-lg font-semibold text-white">
@@ -159,7 +158,6 @@ function ProfileView({
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Contact — sensitive */}
         <Card>
           <CardHeader className="border-b">
             <CardTitle>Contact</CardTitle>
@@ -183,7 +181,6 @@ function ProfileView({
           </CardContent>
         </Card>
 
-        {/* Personal */}
         <Card>
           <CardHeader className="border-b">
             <CardTitle>Personal</CardTitle>
@@ -223,7 +220,6 @@ function ProfileView({
         </Card>
       </div>
 
-      {/* Notes — sensitive */}
       {canSeeSensitive && person.notes ? (
         <Card>
           <CardHeader className="border-b">
@@ -237,7 +233,6 @@ function ProfileView({
         </Card>
       ) : null}
 
-      {/* Related data — Ministries is live (Phase 3); the rest come later. */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <PersonMinistries personId={person.id} />
         <PersonAttendance personId={person.id} />

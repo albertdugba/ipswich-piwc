@@ -1,22 +1,9 @@
 import { z } from 'zod'
 
-/*
- * A Service is a datable gathering (e.g. "Sunday Worship — 9 August 2026").
- * Attendance is recorded per person per service.
- *
- * Firestore collections:
- *   services            — one doc per gathering; `presentCount` is denormalised
- *                         so the list/summary/dashboard read without extra reads
- *   attendanceRecords   — one doc per PRESENT person, id `${serviceId}__${personId}`
- *
- * Phase 4 keeps attendance minimal (present-only): a record exists iff the
- * person was present. Absent is simply the absence of a record. Richer statuses
- * (visitor / child / excused) can be added later without breaking this shape.
- */
 export interface Service {
   id: string
   name: string
-  serviceDate: string // ISO YYYY-MM-DD
+  serviceDate: string
   notes?: string | null
   presentCount: number
   createdAt: number
@@ -45,10 +32,8 @@ export const serviceFormSchema = z.object({
 })
 
 export type ServiceFormValues = z.infer<typeof serviceFormSchema>
-/** Pre-validation shape held by react-hook-form. */
 export type ServiceFormInput = z.input<typeof serviceFormSchema>
 
-/** Today as an ISO YYYY-MM-DD string (local time). */
 export function todayIso(): string {
   const d = new Date()
   const p = (n: number) => String(n).padStart(2, '0')

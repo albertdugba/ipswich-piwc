@@ -41,29 +41,16 @@ import { AlertIcon, HugeiconsIcon, SpinnerIcon } from '@/lib/icons'
 import { displayName, initials } from '@/lib/utils'
 import type { Person } from '@/domain/person'
 
-/*
- * Assign an existing person to a ministry with a role. People come from the
- * People module's query (one Person record, many ministries — Rule 3); anyone
- * already in this ministry is excluded from the picker.
- *
- * The person field is an autocomplete rather than a select: a congregation
- * outgrows a scrollable dropdown quickly, and matching on email/phone lets you
- * disambiguate people who share a name.
- */
-
-// Shown as the secondary line on each option in the Role dropdown.
 const roleHints: Record<DepartmentRole, string> = {
   LEADER: 'Oversees the ministry and its members.',
   ASSISTANT_LEADER: 'Supports the leader and can stand in.',
   MEMBER: 'Serves in the ministry.',
 }
 
-/** Secondary line under a person's name — whatever identifies them best. */
 function personHint(p: Person) {
   return p.email || p.phone || membershipStatusLabels[p.membershipStatus]
 }
 
-/** Match on name, email and phone so a query like "07" or "@gmail" works. */
 function matchesPerson(p: Person, query: string) {
   const q = query.trim().toLowerCase()
   if (!q) return true
@@ -94,7 +81,6 @@ export function AddMemberDialog({
     [peopleQuery.data, existingPersonIds],
   )
 
-  // Start every visit from a clean slate rather than the last attempt's state.
   useEffect(() => {
     if (!open) return
     setPerson(null)

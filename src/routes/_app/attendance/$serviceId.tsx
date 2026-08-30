@@ -71,11 +71,6 @@ function RecordAttendancePage() {
 
   const [editing, setEditing] = useState(false)
 
-  /*
-   * The server list is the single source of truth — there is no local draft and
-   * no Save button. `useTogglePresent` applies each tap optimistically, so this
-   * set updates instantly and rolls back by itself if a write fails.
-   */
   const present = useMemo(
     () => new Set(presentQuery.data ?? []),
     [presentQuery.data],
@@ -88,7 +83,6 @@ function RecordAttendancePage() {
     ? Math.round((presentCount / people.length) * 100)
     : 0
 
-  // Person ids per ministry, for the "mark a whole ministry present" shortcut.
   const ministries = useMemo(() => {
     const byDept = new Map<string, string[]>()
     for (const m of membershipsQuery.data ?? []) {
@@ -103,7 +97,6 @@ function RecordAttendancePage() {
 
   const knownIds = useMemo(() => new Set(people.map((p) => p.id)), [people])
 
-  /** Add ids to the present set in one batched write. */
   function addPresent(personIds: string[]) {
     const next = new Set(present)
     for (const id of personIds) if (knownIds.has(id)) next.add(id)
@@ -176,8 +169,6 @@ function RecordAttendancePage() {
         />
       ) : (
         <>
-          {/* Header. Edit/Delete are secondary to marking the register, so
-              they collapse into an overflow menu instead of two full buttons. */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <span
@@ -224,8 +215,6 @@ function RecordAttendancePage() {
             ) : null}
           </div>
 
-          {/* Live count. Sticks to the top of the scroll area so the running
-              total stays visible while you work down a long roster. */}
           <div className="sticky top-0 z-30 -mx-4 bg-neutral-50/85 px-4 py-2 backdrop-blur-sm sm:-mx-6 sm:px-6">
             <div className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-foreground/10">
               <div className="flex items-center gap-4">
@@ -249,8 +238,6 @@ function RecordAttendancePage() {
                     </span>
                   </div>
                 </div>
-                {/* Saving is per tap, so this reports state rather than
-                    offering an action. */}
                 <SaveStatus
                   pending={togglePresent.isPending || saveAttendance.isPending}
                   failed={Boolean(
@@ -261,7 +248,6 @@ function RecordAttendancePage() {
             </div>
           </div>
 
-          {/* Roster */}
           {!peopleQuery.isLoading && people.length === 0 ? (
             <EmptyState
               title="No people yet"
@@ -302,11 +288,6 @@ function RecordAttendancePage() {
   )
 }
 
-/*
- * Bulk shortcuts. All of them add to the present set rather than replacing it,
- * so combining "copy from last service" with a ministry sweep behaves the way
- * you'd expect. Clearing is the one destructive action and is separated.
- */
 function BulkActions({
   ministries,
   previous,
@@ -341,7 +322,6 @@ function BulkActions({
           </>
         ) : null}
 
-        {/* Base UI requires GroupLabel to live inside a Group. */}
         {ministries.length > 0 ? (
           <>
             <DropdownMenuGroup>
@@ -376,10 +356,6 @@ function BulkActions({
   )
 }
 
-/*
- * Ambient save indicator — replaces the old Save button. Collapses to just the
- * icon on small screens, where the sticky bar is tight for space.
- */
 function SaveStatus({
   pending,
   failed,
@@ -424,7 +400,6 @@ function SaveStatus({
   )
 }
 
-/* Circular attendance progress. Gold track, brand fill — the church's palette. */
 function ProgressRing({ pct }: { pct: number }) {
   const radius = 26
   const circumference = 2 * Math.PI * radius

@@ -14,8 +14,6 @@ describe('permissions', () => {
   })
 
   it('does not let a department leader see church-wide financials write nor sensitive data', () => {
-    // Department leaders can record contributions but only for their own
-    // ministry (row-level, later); they must NOT get sensitive personal data.
     expect(hasPermission('DEPARTMENT_LEADER', 'people:read_sensitive')).toBe(
       false,
     )
@@ -47,8 +45,6 @@ describe('permissions', () => {
   })
 
   it('lets a church admin write every module they administer', () => {
-    // CHURCH_ADMIN originally had contributions:read but not :write, which left
-    // them unable to create a collection in a module they otherwise run.
     expect(
       hasAllPermissions('CHURCH_ADMIN', [
         'people:write',

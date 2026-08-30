@@ -21,15 +21,6 @@ import type {
 import { DEFAULT_MINISTRIES } from '@/domain/department'
 import type { DepartmentRole } from '@/domain/enums'
 
-/*
- * Departments + memberships data access (Cloud Firestore, client Web SDK).
- * Kept out of components so data access stays separate from presentation.
- *
- * Collections:
- *   departments
- *   departmentMemberships   (deterministic id `${departmentId}__${personId}`
- *                            guarantees one membership per person per ministry)
- */
 const DEPARTMENTS = 'departments'
 const MEMBERSHIPS = 'departmentMemberships'
 
@@ -58,14 +49,6 @@ function toMembership(id: string, d: DocumentData): DepartmentMembership {
   }
 }
 
-/*
- * Collapse duplicate rows for the same (department, person) pair so a person can
- * never appear twice on a roster. `setDepartmentMember` writes a deterministic
- * id, but a row created any other way (an older code path, a seed script, the
- * Firebase console) lands on an auto-generated id and shadows it. The
- * deterministic doc always wins; the rest are ignored on read and deleted on the
- * next write or removal.
- */
 function dedupeMemberships(
   rows: DepartmentMembership[],
 ): DepartmentMembership[] {
@@ -78,8 +61,6 @@ function dedupeMemberships(
   return [...byPair.values()]
 }
 
-/** Every membership doc for a pair, matched on fields rather than on id so
- *  legacy auto-id rows are found too. */
 async function findMembershipRefs(departmentId: string, personId: string) {
   const db = getFirebaseDb()
   const snap = await getDocs(
@@ -91,8 +72,6 @@ async function findMembershipRefs(departmentId: string, personId: string) {
   )
   return snap.docs.map((s) => s.ref)
 }
-
-/* ---- Departments ---------------------------------------------------------- */
 
 export async function listDepartments(): Promise<Department[]> {
   const db = getFirebaseDb()
@@ -136,7 +115,6 @@ export async function updateDepartment(
   })
 }
 
-/** Delete a department and all of its membership join docs. */
 export async function deleteDepartment(id: string): Promise<void> {
   const db = getFirebaseDb()
   const members = await getDocs(
@@ -146,7 +124,6 @@ export async function deleteDepartment(id: string): Promise<void> {
   await deleteDoc(doc(db, DEPARTMENTS, id))
 }
 
-/** Create any of the common ministries that don't already exist (by name). */
 export async function seedDefaultDepartments(): Promise<number> {
   const existing = await listDepartments()
   const existingNames = new Set(existing.map((d) => d.name.toLowerCase()))
@@ -165,9 +142,6 @@ export async function seedDefaultDepartments(): Promise<number> {
   return toCreate.length
 }
 
-/* ---- Memberships ---------------------------------------------------------- */
-
-/** Every membership (used to count members per department on the list). */
 export async function listAllMemberships(): Promise<DepartmentMembership[]> {
   const db = getFirebaseDb()
   const snap = await getDocs(collection(db, MEMBERSHIPS))
@@ -197,11 +171,6 @@ export async function listPersonDepartments(
   return dedupeMemberships(snap.docs.map((s) => toMembership(s.id, s.data())))
 }
 
-/*
- * Add a person to a department (or update their role). Idempotent per pair: the
- * canonical deterministic doc is written, then any duplicate rows for the same
- * pair are deleted so the roster self-heals.
- */
 export async function setDepartmentMember(
   departmentId: string,
   personId: string,
@@ -227,8 +196,6 @@ export async function setDepartmentMember(
   await Promise.all(strays.map((r) => deleteDoc(r)))
 }
 
-/** Remove a person from a department, including any duplicate rows — deleting
- *  only the deterministic id would let a legacy row resurrect the membership. */
 export async function removeDepartmentMember(
   departmentId: string,
   personId: string,

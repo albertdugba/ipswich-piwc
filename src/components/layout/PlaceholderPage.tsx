@@ -1,11 +1,6 @@
 import { HugeiconsIcon, type IconSvgElement } from '@/lib/icons'
 import { EmptyState, PageHeader } from '@/components/ui'
 
-/*
- * Shared placeholder for modules not yet implemented. Each module route renders
- * this with its own title/description and intended-phase note, so the
- * navigation is fully wired while implementation happens one phase at a time.
- */
 export function PlaceholderPage({
   title,
   description,

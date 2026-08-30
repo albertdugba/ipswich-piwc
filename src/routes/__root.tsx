@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import {
   HeadContent,
   Outlet,
@@ -10,10 +9,6 @@ import type { ReactNode } from 'react'
 import appCss from '@/styles.css?url'
 import { NotFound } from '@/components/layout/NotFound'
 
-/*
- * The root route owns the HTML document and app-wide providers. The router
- * context (typed here) carries the QueryClient created in src/router.tsx.
- */
 export interface RouterContext {
   queryClient: QueryClient
 }

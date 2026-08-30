@@ -2,11 +2,6 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { ChurchIcon, HugeiconsIcon } from '@/lib/icons'
 import { isFirebaseConfigured } from '@/lib/env.public'
 
-/*
- * Login placeholder. Auth is scaffolded (Firebase Auth) but wired to a mock
- * session for this phase, so this page just explains the current state. When
- * real auth lands, this is where the Firebase sign-in UI goes.
- */
 export const Route = createFileRoute('/login')({
   component: LoginPage,
 })

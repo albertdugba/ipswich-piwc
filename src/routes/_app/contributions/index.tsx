@@ -239,7 +239,6 @@ function ContributionsPage() {
   )
 }
 
-/** Colour by kind so the list is scannable at a glance. */
 const kindTone: Record<ContributionKind, string> = {
   MONTHLY_DUES: 'bg-brand-50 text-brand-700',
   MINISTRY_DUES: 'bg-brand-50 text-brand-700',
