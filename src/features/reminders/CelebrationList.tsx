@@ -35,6 +35,7 @@ const kindTone: Record<CelebrationKind, string> = {
 export function CelebrationList({
   celebrations,
   greetedIds,
+  smsSentIds,
   isLoading,
   canWrite,
   onToggleGreeted,
@@ -42,6 +43,7 @@ export function CelebrationList({
 }: {
   celebrations: Celebration[]
   greetedIds: Set<string>
+  smsSentIds?: Set<string>
   isLoading?: boolean
   canWrite?: boolean
   onToggleGreeted: (c: Celebration, greeted: boolean) => void
@@ -63,6 +65,7 @@ export function CelebrationList({
       {celebrations.map((c) => {
         const id = celebrationId(c)
         const greeted = greetedIds.has(id)
+        const autoTexted = smsSentIds?.has(id) ?? false
         const message = greetingText(c)
         const href = smsHref(c.person.phone, message)
         const sendable = canSms(c.person)
@@ -111,7 +114,11 @@ export function CelebrationList({
                   {relativeDayLabel(c.daysUntil)}
                 </span>
                 <span>{formatDate(c.occursOn)}</span>
-                {!sendable ? (
+                {autoTexted ? (
+                  <span className="font-medium text-emerald-700">
+                    Texted automatically
+                  </span>
+                ) : !sendable ? (
                   <span className="text-muted-foreground/70">
                     {c.person.smsOptOut
                       ? 'Opted out of texts'

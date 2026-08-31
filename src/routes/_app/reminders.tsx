@@ -77,6 +77,16 @@ function RemindersPage() {
     [greetingsQuery.data],
   )
 
+  const smsSentIds = useMemo(
+    () =>
+      new Set(
+        (greetingsQuery.data ?? [])
+          .filter((g) => g.channel === 'SMS')
+          .map((g) => g.id),
+      ),
+    [greetingsQuery.data],
+  )
+
   const counts = useMemo(() => {
     const c: Record<CelebrationKind, number> = {
       BIRTHDAY: 0,
@@ -188,6 +198,7 @@ function RemindersPage() {
           <CelebrationList
             celebrations={shown}
             greetedIds={greetedIds}
+            smsSentIds={smsSentIds}
             isLoading={peopleQuery.isLoading || greetingsQuery.isLoading}
             canWrite={canWrite}
             onToggleGreeted={toggleGreeted}

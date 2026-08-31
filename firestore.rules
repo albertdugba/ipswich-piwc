@@ -20,6 +20,13 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // smsDeliveries holds phone numbers and full message bodies. It is written
+    // only by the scheduled Cloud Function (which bypasses these rules via the
+    // Admin SDK) and must never be readable from the browser.
+    // match /smsDeliveries/{id} {
+    //   allow read, write: if false;
+    // }
+
     // PRODUCTION TARGET (enable once auth is live):
     // match /people/{personId} {
     //   allow read:  if request.auth != null;

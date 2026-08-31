@@ -12,6 +12,7 @@ export default tseslint.config(
       '.nitro',
       'node_modules',
       'drizzle',
+      'functions/lib',
       'src/routeTree.gen.ts',
     ],
   },
@@ -19,7 +20,12 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   ...pluginRouter.configs['flat/recommended'],
   {
-    files: ['server.mjs', '*.config.{js,ts,mjs}', 'vitest.setup.ts'],
+    files: [
+      'server.mjs',
+      '*.config.{js,ts,mjs}',
+      'vitest.setup.ts',
+      'functions/src/**/*.ts',
+    ],
     languageOptions: {
       globals: {
         process: 'readonly',

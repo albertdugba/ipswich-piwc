@@ -13,6 +13,8 @@ import type { CelebrationKind } from '@/domain/celebration'
 
 const GREETINGS = 'celebrationGreetings'
 
+export type GreetingChannel = 'MANUAL' | 'SMS'
+
 export interface Greeting {
   id: string
   personId: string
@@ -20,6 +22,7 @@ export interface Greeting {
   occursOn: string
   greetedAt: number
   greetedById?: string | null
+  channel: GreetingChannel
 }
 
 function toGreeting(id: string, d: DocumentData): Greeting {
@@ -30,6 +33,7 @@ function toGreeting(id: string, d: DocumentData): Greeting {
     occursOn: d.occursOn ?? '',
     greetedAt: d.greetedAt ?? 0,
     greetedById: d.greetedById ?? null,
+    channel: d.channel === 'SMS' ? 'SMS' : 'MANUAL',
   }
 }
 
@@ -69,5 +73,6 @@ export async function setGreeted(
     occursOn,
     greetedAt: Date.now(),
     greetedById: greetedById ?? null,
+    channel: 'MANUAL',
   })
 }

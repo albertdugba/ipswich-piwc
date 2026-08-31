@@ -245,3 +245,55 @@ export function relativeDayLabel(daysUntil: number): string {
 export function celebrationId(c: Celebration): string {
   return `${c.person.id}__${c.kind}__${c.occursOn.slice(0, 4)}`
 }
+
+export const SMS_KINDS: readonly CelebrationKind[] = [
+  'BIRTHDAY',
+  'MARRIAGE_ANNIVERSARY',
+]
+
+export interface PlannedMessage {
+  id: string
+  celebration: Celebration
+  to: string
+  body: string
+}
+
+export interface PlanInput {
+  people: Person[]
+  todayIso: string
+  alreadyHandledIds: Iterable<string>
+  kinds?: readonly CelebrationKind[]
+  renderBody: (c: Celebration) => string
+  normalisePhone: (raw: string | null | undefined) => string | null
+}
+
+export function planCelebrationMessages({
+  people,
+  todayIso,
+  alreadyHandledIds,
+  kinds = SMS_KINDS,
+  renderBody,
+  normalisePhone,
+}: PlanInput): PlannedMessage[] {
+  const handled = new Set(alreadyHandledIds)
+  const out: PlannedMessage[] = []
+
+  for (const c of upcomingCelebrations(people, {
+    fromIso: todayIso,
+    windowDays: 0,
+    kinds,
+  })) {
+    if (c.daysUntil !== 0) continue
+    if (!canSms(c.person)) continue
+
+    const id = celebrationId(c)
+    if (handled.has(id)) continue
+
+    const to = normalisePhone(c.person.phone)
+    if (!to) continue
+
+    out.push({ id, celebration: c, to, body: renderBody(c) })
+  }
+
+  return out
+}

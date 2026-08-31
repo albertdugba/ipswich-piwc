@@ -7,6 +7,7 @@ import {
   nextOccurrence,
   observedDate,
   parseIsoDate,
+  planCelebrationMessages,
   receivesCelebrations,
   receivesMarriageAnniversary,
   upcomingCelebrations,
@@ -302,5 +303,124 @@ describe('celebrationId', () => {
       { fromIso: '2026-07-13', windowDays: 0 },
     )
     expect(celebrationId(c!)).toBe('p9__BIRTHDAY__2026')
+  })
+})
+
+describe('planCelebrationMessages', () => {
+  const today = '2026-07-13'
+  const opts = {
+    todayIso: today,
+    renderBody: (c: Parameters<typeof celebrationId>[0]) =>
+      `hi ${c.person.firstName}`,
+    normalisePhone: (raw: string | null | undefined) =>
+      raw && raw.trim() ? `+44${raw.trim()}` : null,
+  }
+
+  it('only sends on the day itself, never in advance', () => {
+    const people = [
+      person({ id: 'today', dateOfBirth: '1990-07-13', phone: '1' }),
+      person({ id: 'tomorrow', dateOfBirth: '1990-07-14', phone: '2' }),
+    ]
+    const plan = planCelebrationMessages({
+      people,
+      alreadyHandledIds: [],
+      ...opts,
+    })
+    expect(plan.map((p) => p.celebration.person.id)).toEqual(['today'])
+  })
+
+  it('skips anyone already greeted, so a retry cannot double-send', () => {
+    const people = [person({ id: 'p1', dateOfBirth: '1990-07-13', phone: '1' })]
+    const first = planCelebrationMessages({
+      people,
+      alreadyHandledIds: [],
+      ...opts,
+    })
+    expect(first).toHaveLength(1)
+
+    const second = planCelebrationMessages({
+      people,
+      alreadyHandledIds: first.map((p) => p.id),
+      ...opts,
+    })
+    expect(second).toEqual([])
+  })
+
+  it('never messages a deceased member', () => {
+    const people = [
+      person({
+        id: 'gone',
+        dateOfBirth: '1990-07-13',
+        phone: '1',
+        membershipStatus: 'DECEASED',
+      }),
+    ]
+    expect(
+      planCelebrationMessages({ people, alreadyHandledIds: [], ...opts }),
+    ).toEqual([])
+  })
+
+  it('never messages someone who opted out', () => {
+    const people = [
+      person({ dateOfBirth: '1990-07-13', phone: '1', smsOptOut: true }),
+    ]
+    expect(
+      planCelebrationMessages({ people, alreadyHandledIds: [], ...opts }),
+    ).toEqual([])
+  })
+
+  it('never sends a wedding anniversary to a widow', () => {
+    const people = [
+      person({
+        id: 'w',
+        marriageDate: '2010-07-13',
+        maritalStatus: 'WIDOWED',
+        phone: '1',
+      }),
+    ]
+    expect(
+      planCelebrationMessages({ people, alreadyHandledIds: [], ...opts }),
+    ).toEqual([])
+  })
+
+  it('excludes membership anniversaries from SMS by default', () => {
+    const people = [
+      person({ id: 'm', membershipDate: '2015-07-13', phone: '1' }),
+    ]
+    expect(
+      planCelebrationMessages({ people, alreadyHandledIds: [], ...opts }),
+    ).toEqual([])
+  })
+
+  it('drops anyone whose number cannot be dialled', () => {
+    const people = [
+      person({ id: 'nophone', dateOfBirth: '1990-07-13' }),
+      person({ id: 'blank', dateOfBirth: '1990-07-13', phone: '   ' }),
+    ]
+    expect(
+      planCelebrationMessages({ people, alreadyHandledIds: [], ...opts }),
+    ).toEqual([])
+  })
+
+  it('produces one message per celebration with a dialable number and body', () => {
+    const people = [
+      person({
+        id: 'both',
+        firstName: 'Ama',
+        dateOfBirth: '1990-07-13',
+        marriageDate: '2010-07-13',
+        maritalStatus: 'MARRIED',
+        phone: '7700900123',
+      }),
+    ]
+    const plan = planCelebrationMessages({
+      people,
+      alreadyHandledIds: [],
+      ...opts,
+    })
+    expect(plan).toHaveLength(2)
+    expect(plan[0]!.to).toBe('+447700900123')
+    expect(plan[0]!.body).toBe('hi Ama')
+    expect(new Set(plan.map((p) => p.id)).size).toBe(2)
   })
 })
