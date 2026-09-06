@@ -1,5 +1,4 @@
 import {
-  AnalyticsIcon,
   AttendanceIcon,
   ContributionIcon,
   DashboardIcon,
@@ -65,12 +64,6 @@ export const NAV_ITEMS: NavItem[] = [
     to: '/testimonies',
     icon: TestimonyIcon,
     permission: 'testimonies:read',
-  },
-  {
-    label: 'Analytics',
-    to: '/analytics',
-    icon: AnalyticsIcon,
-    permission: 'analytics:read',
   },
   {
     label: 'Settings',

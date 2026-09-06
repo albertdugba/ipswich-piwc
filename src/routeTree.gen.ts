@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppPrayerRequestsRouteImport } from './routes/_app/prayer-requests'
 import { Route as AppRemindersRouteImport } from './routes/_app/reminders'
@@ -40,11 +39,6 @@ const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AppRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
@@ -116,7 +110,6 @@ const AppPeoplePersonIdRoute = AppPeoplePersonIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/analytics': typeof AppAnalyticsRoute
   '/dashboard': typeof AppDashboardRoute
   '/prayer-requests': typeof AppPrayerRequestsRoute
   '/reminders': typeof AppRemindersRoute
@@ -134,7 +127,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/analytics': typeof AppAnalyticsRoute
   '/dashboard': typeof AppDashboardRoute
   '/prayer-requests': typeof AppPrayerRequestsRoute
   '/reminders': typeof AppRemindersRoute
@@ -154,7 +146,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/prayer-requests': typeof AppPrayerRequestsRoute
   '/_app/reminders': typeof AppRemindersRoute
@@ -174,7 +165,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
-    | '/analytics'
     | '/dashboard'
     | '/prayer-requests'
     | '/reminders'
@@ -192,7 +182,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
-    | '/analytics'
     | '/dashboard'
     | '/prayer-requests'
     | '/reminders'
@@ -211,7 +200,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/login'
-    | '/_app/analytics'
     | '/_app/dashboard'
     | '/_app/prayer-requests'
     | '/_app/reminders'
@@ -255,13 +243,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_app/analytics': {
-      id: '/_app/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AppAnalyticsRouteImport
-      parentRoute: typeof AppRoute
     }
     '/_app/dashboard': {
       id: '/_app/dashboard'
@@ -358,7 +339,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
-  AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppPrayerRequestsRoute: typeof AppPrayerRequestsRoute
   AppRemindersRoute: typeof AppRemindersRoute
@@ -375,7 +355,6 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAnalyticsRoute: AppAnalyticsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppPrayerRequestsRoute: AppPrayerRequestsRoute,
   AppRemindersRoute: AppRemindersRoute,

@@ -22,10 +22,13 @@ export interface DashboardSummary {
     today: { couple: string; years: number }[]
     thisWeek: { couple: string; date: string; years: number }[]
   }
+  membershipGrowth: {
+    monthly: { label: string; total: number; joined: number }[]
+  }
   needsAttention: {
     visitorsToFollowUp: number
     newPrayerRequests: number
-    absentMembers: { name: string; weeks: number }[]
+    absentMembers: { name: string; weeks: number; lastSeen: string }[]
   }
   ministries: {
     total: number
@@ -82,13 +85,25 @@ export const dashboardMock: DashboardSummary = {
       { couple: 'David & Sarah Brown', date: 'Thu 13 Aug', years: 15 },
     ],
   },
+  membershipGrowth: {
+    monthly: [
+      { label: 'Feb', total: 188, joined: 4 },
+      { label: 'Mar', total: 193, joined: 6 },
+      { label: 'Apr', total: 197, joined: 5 },
+      { label: 'May', total: 201, joined: 5 },
+      { label: 'Jun', total: 205, joined: 6 },
+      { label: 'Jul', total: 209, joined: 5 },
+      { label: 'Aug', total: 214, joined: 7 },
+      { label: 'Sep', total: 214, joined: 2 },
+    ],
+  },
   needsAttention: {
     visitorsToFollowUp: 6,
     newPrayerRequests: 4,
     absentMembers: [
-      { name: 'Kwame Boateng', weeks: 5 },
-      { name: 'Grace Adjei', weeks: 4 },
-      { name: 'Michael Osei', weeks: 3 },
+      { name: 'Kwame Boateng', weeks: 5, lastSeen: '3 Aug' },
+      { name: 'Grace Adjei', weeks: 4, lastSeen: '10 Aug' },
+      { name: 'Michael Osei', weeks: 3, lastSeen: '17 Aug' },
     ],
   },
   ministries: {

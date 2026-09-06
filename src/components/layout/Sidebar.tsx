@@ -67,7 +67,7 @@ function NavLink({
       activeOptions={{ exact: item.to === '/people' }}
       className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-black/5 hover:text-neutral-900"
       activeProps={{
-        className: 'bg-white text-neutral-900 hover:bg-white',
+        className: 'bg-brand-600 text-white hover:bg-brand-600 hover:text-white',
       }}
     >
       {({ isActive }: { isActive: boolean }) => (
@@ -77,7 +77,7 @@ function NavLink({
             strokeWidth={2}
             className={
               isActive
-                ? 'size-5 shrink-0 text-brand-600'
+                ? 'size-5 shrink-0 text-white'
                 : 'size-5 shrink-0 text-neutral-500 group-hover:text-neutral-700'
             }
           />

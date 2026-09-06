@@ -41,7 +41,7 @@ describe('permissions', () => {
 
   it('treats a null/undefined role as unauthorised', () => {
     expect(hasPermission(null, 'people:read')).toBe(false)
-    expect(hasPermission(undefined, 'analytics:read')).toBe(false)
+    expect(hasPermission(undefined, 'settings:manage')).toBe(false)
   })
 
   it('lets a church admin write every module they administer', () => {

@@ -17,7 +17,6 @@ export const PERMISSIONS = [
   'prayer:moderate',
   'testimonies:read',
   'testimonies:moderate',
-  'analytics:read',
   'settings:manage',
   'users:manage',
 ] as const
@@ -41,7 +40,6 @@ export const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
     'prayer:moderate',
     'testimonies:read',
     'testimonies:moderate',
-    'analytics:read',
   ],
 
   CHURCH_ADMIN: [
@@ -60,7 +58,6 @@ export const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
     'prayer:moderate',
     'testimonies:read',
     'testimonies:moderate',
-    'analytics:read',
     'settings:manage',
   ],
 

@@ -54,6 +54,8 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* Remove the grey flash when tapping on touch devices. */
+    -webkit-tap-highlight-color: transparent;
     font-family:
       ui-sans-serif,
       system-ui,
@@ -68,6 +70,34 @@
 
   body {
     @apply antialiased bg-background text-foreground;
+    /* Stop the whole page rubber-banding; scrolling lives in inner regions. */
+    overscroll-behavior-y: none;
+  }
+
+  /* Snappier taps: no 300ms delay, no long-press callout on controls. */
+  button,
+  a,
+  [role='button'],
+  label,
+  summary {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+  }
+
+  /* When installed to the home screen, behave like a native app. */
+  @media (display-mode: standalone) {
+    body {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    /* …but never trap the user inside form fields. */
+    input,
+    textarea,
+    select,
+    [contenteditable='true'] {
+      user-select: text;
+      -webkit-user-select: text;
+    }
   }
 
   /* Visible focus ring for keyboard users (accessibility, Rule 9). */

@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -27,7 +26,6 @@ export interface AttendanceRosterProps {
   isLoading?: boolean
   canWrite?: boolean
   onToggle: (personId: string, present: boolean) => void
-  onMarkVisible: (personIds: string[]) => void
   actions?: React.ReactNode
 }
 
@@ -44,7 +42,6 @@ export function AttendanceRoster({
   isLoading,
   canWrite = true,
   onToggle,
-  onMarkVisible,
   actions,
 }: AttendanceRosterProps) {
   const [search, setSearch] = useState('')
@@ -78,8 +75,6 @@ export function AttendanceRoster({
   }, [visible])
 
   const available = new Set(sections.map(([letter]) => letter))
-  const visibleUnmarked = visible.filter((p) => !presentIds.has(p.id))
-  const filtering = Boolean(search.trim()) || status !== 'ALL' || onlyUnmarked
 
   function jumpTo(letter: string) {
     const el = scrollRef.current?.querySelector(`[data-letter="${letter}"]`)
@@ -156,16 +151,6 @@ export function AttendanceRoster({
             >
               Not yet marked ({people.length - presentIds.size})
             </button>
-            {visibleUnmarked.length > 0 ? (
-              <Button
-                variant="outline"
-                onClick={() => onMarkVisible(visibleUnmarked.map((p) => p.id))}
-              >
-                <HugeiconsIcon icon={CheckIcon} />
-                Mark {filtering ? 'these' : 'all'} {visibleUnmarked.length}{' '}
-                present
-              </Button>
-            ) : null}
           </div>
         ) : null}
       </div>
@@ -191,7 +176,7 @@ export function AttendanceRoster({
           ) : (
             sections.map(([letter, group]) => (
               <section key={letter} data-letter={letter}>
-                <h3 className="sticky top-0 z-10 bg-muted/80 px-4 py-1 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
+                <h3 className="sticky top-0 z-10 border-b border-border/50 bg-muted/70 px-4 py-1 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase backdrop-blur-sm">
                   {letter}
                 </h3>
                 <ul>
@@ -253,47 +238,45 @@ function RosterRow({
   onToggle: (personId: string, present: boolean) => void
 }) {
   return (
-    <li className="border-b border-border/60 last:border-0">
+    <li className="relative border-b border-border/50 last:border-0">
+      {/* Left accent marks a present row without washing out the whole line. */}
+      <span
+        aria-hidden
+        className={cn(
+          'absolute inset-y-0 left-0 w-1 rounded-r-full bg-emerald-500 transition-opacity',
+          present ? 'opacity-100' : 'opacity-0',
+        )}
+      />
       <button
         type="button"
         disabled={disabled}
         aria-pressed={present}
         onClick={() => onToggle(person.id, !present)}
         className={cn(
-          'flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring',
-          present ? 'bg-brand-50/70 hover:bg-brand-50' : 'hover:bg-muted/50',
+          'flex w-full items-center gap-3 py-2.5 pr-3 pl-4 text-left transition-colors focus-visible:outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring',
+          present ? 'bg-emerald-50/60 hover:bg-emerald-50' : 'hover:bg-muted/40',
           disabled && 'cursor-default',
         )}
       >
+        {/* Avatar keeps the person's identity whether present or not. */}
         <span
           aria-hidden
           className={cn(
-            'flex size-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold transition-colors',
+            'flex size-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ring-1 transition-colors',
             present
-              ? 'bg-brand-600 text-white'
-              : 'bg-muted text-muted-foreground',
+              ? 'bg-emerald-100 text-emerald-700 ring-emerald-200'
+              : 'bg-muted text-muted-foreground ring-transparent',
           )}
         >
-          {present ? (
-            <HugeiconsIcon icon={CheckIcon} className="size-4.5" />
-          ) : (
-            initials(person.firstName, person.lastName)
-          )}
+          {initials(person.firstName, person.lastName)}
         </span>
 
         <span className="min-w-0 flex-1">
-          <span
-            className={cn(
-              'block truncate text-sm',
-              present
-                ? 'font-semibold text-brand-900'
-                : 'font-medium text-foreground',
-            )}
-          >
+          <span className="block truncate text-sm font-medium text-foreground">
             {displayName(person)}
           </span>
           {person.phone ? (
-            <span className="block truncate text-xs text-muted-foreground">
+            <span className="block truncate text-xs text-muted-foreground tabular-nums">
               {person.phone}
             </span>
           ) : null}
@@ -301,18 +284,17 @@ function RosterRow({
 
         <MembershipBadge status={person.membershipStatus} />
 
+        {/* Single, obvious presence toggle. */}
         <span
           aria-hidden
           className={cn(
-            'flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+            'flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-all',
             present
-              ? 'border-brand-600 bg-brand-600 text-white'
-              : 'border-input',
+              ? 'border-emerald-500 bg-emerald-500 text-white'
+              : 'border-input text-transparent',
           )}
         >
-          {present ? (
-            <HugeiconsIcon icon={CheckIcon} className="size-3" />
-          ) : null}
+          <HugeiconsIcon icon={CheckIcon} className="size-3.5" />
         </span>
       </button>
     </li>

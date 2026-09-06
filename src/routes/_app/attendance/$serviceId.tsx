@@ -264,7 +264,6 @@ function RecordAttendancePage() {
               isLoading={peopleQuery.isLoading || presentQuery.isLoading}
               canWrite={canWrite}
               onToggle={handleToggle}
-              onMarkVisible={addPresent}
               actions={
                 canWrite ? (
                   <BulkActions
