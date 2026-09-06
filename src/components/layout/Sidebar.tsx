@@ -28,7 +28,7 @@ export function SidebarNav({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         {main.map((item, index) => {
           const prev = main[index - 1]
           const showGroup = item.group && item.group !== prev?.group
@@ -45,7 +45,7 @@ export function SidebarNav({
         })}
       </nav>
       {settings ? (
-        <div className="border-t border-neutral-200 p-3">
+        <div className="border-t border-neutral-200 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <NavLink item={settings} onNavigate={onNavigate} />
         </div>
       ) : null}

@@ -30,10 +30,14 @@ export function MobileTabBar({ user }: { user: AuthUser }) {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/85 backdrop-blur-lg md:hidden"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur-lg md:hidden"
+      // Respect the home indicator, but trim the inset so the bar sits lower
+      // and doesn't leave a big empty gap in the installed app.
+      style={{
+        paddingBottom: 'max(0.25rem, calc(env(safe-area-inset-bottom) - 0.5rem))',
+      }}
     >
-      <div className="flex h-16 items-stretch">
+      <div className="flex h-14 items-stretch">
         {tabs.map((item) => (
           <Link
             key={item.to}
