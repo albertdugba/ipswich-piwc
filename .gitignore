@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # Test / coverage
 coverage
+
+# Vercel
+.vercel
