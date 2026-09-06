@@ -16,7 +16,7 @@ export function AppShell({
       <Topbar user={user} />
       <div className="flex min-h-0 flex-1">
         <Sidebar user={user} />
-        <main className="min-w-0 flex-1 overflow-y-auto overscroll-contain bg-neutral-50">
+        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain bg-neutral-50">
           <div className="mx-auto w-full max-w-7xl px-4 pt-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-10 lg:px-10">
             {children}
           </div>
