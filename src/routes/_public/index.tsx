@@ -39,6 +39,15 @@ import {
 } from '@/features/public/content'
 
 export const Route = createFileRoute('/_public/')({
+  head: () => ({
+    meta: [
+      { title: `${church.name} — ${church.parent}` },
+      {
+        name: 'description',
+        content: `${church.tagline} Sunday worship at ${church.venue}, ${church.address.line2}.`,
+      },
+    ],
+  }),
   component: HomePage,
 })
 

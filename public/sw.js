@@ -1,6 +1,6 @@
 // Ipswich PIWC — service worker
 // Bump CACHE when the precache list changes to force an update.
-const CACHE = 'piwc-cache-v1'
+const CACHE = 'piwc-cache-v2'
 
 // Static assets safe to precache. Routes are cached at runtime instead, since
 // they are server-rendered and reference hashed build files that change.
@@ -12,7 +12,8 @@ const PRECACHE = [
   '/icons/apple-touch-icon.png',
 ]
 
-const OFFLINE_FALLBACK = '/dashboard'
+// The public landing page is the front door; staff reach the dashboard from it.
+const OFFLINE_FALLBACK = '/'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

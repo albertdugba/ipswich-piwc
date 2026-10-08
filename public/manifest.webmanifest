@@ -1,9 +1,9 @@
 {
-  "name": "Ipswich PIWC — Church Management",
+  "name": "Ipswich PIWC — The Church of Pentecost",
   "short_name": "Ipswich PIWC",
-  "description": "Internal church management for The Church of Pentecost — Ipswich PIWC.",
+  "description": "The Church of Pentecost — Ipswich PIWC. Sunday worship, prayer and church life in Ipswich.",
   "id": "/",
-  "start_url": "/dashboard",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
