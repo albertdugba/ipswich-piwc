@@ -1,3 +1,4 @@
+import type * as React from 'react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -46,6 +47,33 @@ function smoothPath(points: [number, number][]): string {
   return d.join(' ')
 }
 
+/**
+ * Indices whose x-axis label should be drawn so labels never collide on narrow
+ * screens. Always keeps the latest point and steps back from there.
+ */
+function visibleLabelIndices(count: number, slot: number, minGap = 46) {
+  const step = Math.max(1, Math.ceil(minGap / Math.max(slot, 1)))
+  const shown = new Set<number>()
+  for (let i = count - 1; i >= 0; i -= step) shown.add(i)
+  return shown
+}
+
+/** Shorter plots on phones so a chart never fills the whole screen. */
+function responsiveHeight(width: number, height: number) {
+  return width < 480 ? Math.round(height * 0.8) : height
+}
+
+/**
+ * Hover on desktop, tap on touch: a touch pointer leaving the chart (which
+ * fires right after the finger lifts) shouldn't hide the tooltip it just
+ * opened — only a mouse leaving does.
+ */
+function clearOnMouseLeave(setActive: (i: number | null) => void) {
+  return (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse') setActive(null)
+  }
+}
+
 function ChartTooltip({
   x,
   y,
@@ -75,7 +103,7 @@ function ChartTooltip({
 /** Smooth gradient area chart — for continuous trends (e.g. membership growth). */
 export function AreaChart({
   data,
-  height = 210,
+  height: heightProp = 210,
   formatValue = (n) => n.toLocaleString(),
   ariaLabel,
 }: {
@@ -87,10 +115,15 @@ export function AreaChart({
   const { ref, width } = useContainerWidth()
   const [active, setActive] = useState<number | null>(null)
   const gradientId = useId()
+  const height = responsiveHeight(width, heightProp)
 
-  const pad = { top: 18, right: 8, bottom: 26, left: 8 }
+  const pad = { top: 18, right: 14, bottom: 26, left: 14 }
   const innerW = Math.max(width - pad.left - pad.right, 1)
   const innerH = Math.max(height - pad.top - pad.bottom, 1)
+  const labelIdx = visibleLabelIndices(
+    data.length,
+    innerW / Math.max(data.length - 1, 1),
+  )
 
   const values = data.map((d) => d.value)
   const max = Math.max(...values, 1)
@@ -101,7 +134,8 @@ export function AreaChart({
   const domainSpan = domainMax - domainMin || 1
 
   const xOf = (i: number) =>
-    pad.left + (data.length <= 1 ? innerW / 2 : (i / (data.length - 1)) * innerW)
+    pad.left +
+    (data.length <= 1 ? innerW / 2 : (i / (data.length - 1)) * innerW)
   const yOf = (v: number) =>
     pad.top + innerH - ((v - domainMin) / domainSpan) * innerH
 
@@ -117,13 +151,21 @@ export function AreaChart({
         height={height}
         role="img"
         aria-label={ariaLabel}
-        className="overflow-visible"
-        onMouseLeave={() => setActive(null)}
+        className="touch-pan-y overflow-visible select-none"
+        onPointerLeave={clearOnMouseLeave(setActive)}
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-brand-500)" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="var(--color-brand-500)" stopOpacity="0.02" />
+            <stop
+              offset="0%"
+              stopColor="var(--color-brand-500)"
+              stopOpacity="0.35"
+            />
+            <stop
+              offset="100%"
+              stopColor="var(--color-brand-500)"
+              stopOpacity="0.02"
+            />
           </linearGradient>
         </defs>
 
@@ -168,7 +210,13 @@ export function AreaChart({
           if (!isActive && !isLast) return null
           return (
             <g key={i}>
-              <circle cx={px} cy={py} r={isActive ? 7 : 5} fill="var(--color-brand-600)" fillOpacity={0.15} />
+              <circle
+                cx={px}
+                cy={py}
+                r={isActive ? 7 : 5}
+                fill="var(--color-brand-600)"
+                fillOpacity={0.15}
+              />
               <circle
                 cx={px}
                 cy={py}
@@ -181,19 +229,21 @@ export function AreaChart({
           )
         })}
 
-        {data.map((d, i) => (
-          <text
-            key={d.label}
-            x={xOf(i)}
-            y={height - 8}
-            textAnchor="middle"
-            fill="currentColor"
-            fontSize={11}
-            className={cn(active === i && 'font-semibold')}
-          >
-            {d.label}
-          </text>
-        ))}
+        {data.map((d, i) =>
+          labelIdx.has(i) ? (
+            <text
+              key={d.label}
+              x={xOf(i)}
+              y={height - 8}
+              textAnchor="middle"
+              fill="currentColor"
+              fontSize={11}
+              className={cn(active === i && 'font-semibold')}
+            >
+              {d.label}
+            </text>
+          ) : null,
+        )}
 
         {/* Invisible hit areas for hover. */}
         {data.map((d, i) => {
@@ -206,7 +256,8 @@ export function AreaChart({
               width={bandW}
               height={height}
               fill="transparent"
-              onMouseEnter={() => setActive(i)}
+              onPointerEnter={() => setActive(i)}
+              onPointerDown={() => setActive(i)}
             />
           )
         })}
@@ -228,7 +279,7 @@ export function AreaChart({
 /** Rounded bar chart with an optional average reference line — for discrete counts. */
 export function BarChart({
   data,
-  height = 210,
+  height: heightProp = 210,
   average,
   formatValue = (n) => n.toLocaleString(),
   ariaLabel,
@@ -242,8 +293,9 @@ export function BarChart({
   const { ref, width } = useContainerWidth()
   const [active, setActive] = useState<number | null>(null)
   const gradientId = useId()
+  const height = responsiveHeight(width, heightProp)
 
-  const pad = { top: 18, right: 8, bottom: 26, left: 8 }
+  const pad = { top: 18, right: 4, bottom: 26, left: 4 }
   const innerW = Math.max(width - pad.left - pad.right, 1)
   const innerH = Math.max(height - pad.top - pad.bottom, 1)
 
@@ -251,6 +303,7 @@ export function BarChart({
   const domainMax = max * 1.1
   const slot = innerW / Math.max(data.length, 1)
   const barW = Math.min(slot * 0.6, 40)
+  const labelIdx = visibleLabelIndices(data.length, slot)
 
   const yOf = (v: number) => pad.top + innerH - (v / domainMax) * innerH
   const xCenter = (i: number) => pad.left + slot * i + slot / 2
@@ -263,8 +316,8 @@ export function BarChart({
         height={height}
         role="img"
         aria-label={ariaLabel}
-        className="overflow-visible"
-        onMouseLeave={() => setActive(null)}
+        className="touch-pan-y overflow-visible select-none"
+        onPointerLeave={clearOnMouseLeave(setActive)}
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -303,7 +356,8 @@ export function BarChart({
           return (
             <g
               key={d.label}
-              onMouseEnter={() => setActive(i)}
+              onPointerEnter={() => setActive(i)}
+              onPointerDown={() => setActive(i)}
               className="cursor-default"
             >
               <rect
@@ -318,20 +372,24 @@ export function BarChart({
                 y={top}
                 width={barW}
                 height={Math.max(barH, 2)}
-                rx={5}
-                fill={highlight ? `url(#${gradientId})` : 'var(--color-brand-200)'}
+                rx={4}
+                fill={
+                  highlight ? `url(#${gradientId})` : 'var(--color-brand-200)'
+                }
                 className="transition-all"
               />
-              <text
-                x={xCenter(i)}
-                y={height - 8}
-                textAnchor="middle"
-                fill="currentColor"
-                fontSize={11}
-                className={cn(isActive && 'font-semibold')}
-              >
-                {d.label}
-              </text>
+              {labelIdx.has(i) ? (
+                <text
+                  x={xCenter(i)}
+                  y={height - 8}
+                  textAnchor="middle"
+                  fill="currentColor"
+                  fontSize={11}
+                  className={cn(isActive && 'font-semibold')}
+                >
+                  {d.label}
+                </text>
+              ) : null}
             </g>
           )
         })}
@@ -352,6 +410,9 @@ export function BarChart({
               y={avgY - 5}
               textAnchor="end"
               fill="var(--color-gold-700)"
+              stroke="var(--card)"
+              strokeWidth={4}
+              paintOrder="stroke"
               fontSize={10}
               className="font-medium"
             >
@@ -370,95 +431,6 @@ export function BarChart({
           value={formatValue(data[active].value)}
         />
       )}
-    </div>
-  )
-}
-
-export interface DonutSegment {
-  label: string
-  value: number
-  color: string
-}
-
-/** Donut chart for part-to-whole breakdowns, with an optional controlled active slice. */
-export function DonutChart({
-  segments,
-  size = 176,
-  thickness = 24,
-  centerValue,
-  centerLabel,
-  active: activeProp,
-  onActiveChange,
-  ariaLabel,
-}: {
-  segments: DonutSegment[]
-  size?: number
-  thickness?: number
-  centerValue: string | number
-  centerLabel?: string
-  active?: number | null
-  onActiveChange?: (index: number | null) => void
-  ariaLabel?: string
-}) {
-  const [internal, setInternal] = useState<number | null>(null)
-  const active = activeProp !== undefined ? activeProp : internal
-  const setActive = onActiveChange ?? setInternal
-
-  const total = segments.reduce((s, x) => s + x.value, 0) || 1
-  const r = (size - thickness) / 2
-  const c = size / 2
-  const circumference = 2 * Math.PI * r
-  const gap = segments.length > 1 ? 3 : 0
-
-  let cumulative = 0
-  const arcs = segments.map((seg) => {
-    const len = (seg.value / total) * circumference
-    const start = cumulative
-    cumulative += len
-    return { seg, len, start }
-  })
-
-  const shown = active != null ? segments[active] : null
-
-  return (
-    <div
-      className="relative shrink-0"
-      style={{ width: size, height: size }}
-      role="img"
-      aria-label={ariaLabel}
-    >
-      <svg width={size} height={size} className="-rotate-90">
-        {arcs.map(({ seg, len, start }, i) => {
-          const dash = Math.max(len - gap, 0)
-          const isActive = active === i
-          const dim = active != null && !isActive
-          return (
-            <circle
-              key={seg.label}
-              cx={c}
-              cy={c}
-              r={r}
-              fill="none"
-              stroke={seg.color}
-              strokeWidth={isActive ? thickness + 4 : thickness}
-              strokeDasharray={`${dash} ${circumference - dash}`}
-              strokeDashoffset={-start}
-              className="cursor-default transition-all duration-200"
-              style={{ opacity: dim ? 0.3 : 1 }}
-              onMouseEnter={() => setActive(i)}
-              onMouseLeave={() => setActive(null)}
-            />
-          )
-        })}
-      </svg>
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="text-2xl font-semibold tracking-tight text-foreground tabular-nums">
-          {shown ? shown.value : centerValue}
-        </span>
-        <span className="max-w-[70%] truncate text-xs text-muted-foreground">
-          {shown ? shown.label : centerLabel}
-        </span>
-      </div>
     </div>
   )
 }
@@ -493,8 +465,16 @@ export function Sparkline({
     <svg width={width} height={height} className={className} aria-hidden="true">
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--color-brand-500)" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="var(--color-brand-500)" stopOpacity="0" />
+          <stop
+            offset="0%"
+            stopColor="var(--color-brand-500)"
+            stopOpacity="0.25"
+          />
+          <stop
+            offset="100%"
+            stopColor="var(--color-brand-500)"
+            stopOpacity="0"
+          />
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#${gradientId})`} />
@@ -507,5 +487,57 @@ export function Sparkline({
         strokeLinejoin="round"
       />
     </svg>
+  )
+}
+
+export interface RankedBarItem {
+  label: string
+  value: number
+}
+
+/**
+ * Horizontal ranked bars — one hue, sorted largest first. Reads far better
+ * than a many-slice donut, especially on a phone.
+ */
+export function RankedBars({
+  items,
+  total,
+  ariaLabel,
+}: {
+  items: RankedBarItem[]
+  total: number
+  ariaLabel?: string
+}) {
+  const sorted = [...items].sort((a, b) => b.value - a.value)
+  const max = Math.max(...sorted.map((i) => i.value), 1)
+  return (
+    <ul aria-label={ariaLabel} className="space-y-3">
+      {sorted.map((item) => {
+        const pct = total ? Math.round((item.value / total) * 100) : 0
+        return (
+          <li key={item.label}>
+            <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
+              <span className="min-w-0 truncate text-foreground">
+                {item.label}
+              </span>
+              <span className="shrink-0 tabular-nums">
+                <span className="font-medium text-foreground">
+                  {item.value}
+                </span>
+                <span className="ml-1.5 inline-block w-8 text-right text-xs text-muted-foreground">
+                  {pct}%
+                </span>
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-brand-50">
+              <div
+                className="h-full rounded-full bg-brand-500"
+                style={{ width: `${(item.value / max) * 100}%` }}
+              />
+            </div>
+          </li>
+        )
+      })}
+    </ul>
   )
 }

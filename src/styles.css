@@ -2,6 +2,9 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/geist';
+@import '@fontsource-variable/instrument-sans/index.css';
+@import '@fontsource-variable/newsreader/opsz.css';
+@import '@fontsource-variable/newsreader/opsz-italic.css';
 /*
  ---break---
  */
@@ -27,6 +30,7 @@
   --color-brand-700: oklch(0.41 0.19 266);
   --color-brand-800: oklch(0.35 0.16 266);
   --color-brand-900: oklch(0.3 0.13 266);
+  --color-brand-950: oklch(0.23 0.1 266);
 
   /* Banner gold (secondary accent — use dark text on gold, never white). */
   --color-gold-50: oklch(0.98 0.025 96);
@@ -49,6 +53,17 @@
   --color-surface: oklch(1 0 0);
   --color-surface-muted: oklch(0.985 0.003 266);
   --color-border-subtle: oklch(0.92 0.005 266);
+
+  /*
+   * Public site — quiet and warm: navy-charcoal ink, ivory paper, the church's
+   * royal blue and gold kept for accents only.
+   */
+  --color-ink: oklch(0.25 0.05 266);
+  --color-paper: oklch(0.976 0.008 80);
+  --font-display: 'Newsreader Variable', ui-serif, Georgia, serif;
+  /* Public-site sans (the dashboard keeps Geist). */
+  --font-public: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader Variable', ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -101,6 +116,12 @@
   }
 
   /* Visible focus ring for keyboard users (accessibility, Rule 9). */
+  /* In-page links glide to their section (header nav, "Plan your visit"). */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-brand-500;
   }
@@ -108,6 +129,7 @@
     @apply border-border outline-ring/50;
   }
 }
+
 /*
  ---break---
  */
@@ -230,4 +252,82 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.56 0.195 266);
+}
+
+/*
+ * Public-site type scale — one set of roles, used everywhere, so the
+ * hierarchy reads the same in every section:
+ *   type-display   hero headline
+ *   type-h2        section heading
+ *   type-statement large serif statement (welcome, scripture)
+ *   type-h3        card / row title
+ *   type-eyebrow   small label above a heading
+ *   type-lead      intro paragraph under a heading
+ *   type-body      running text
+ *   type-meta      captions, details, secondary info
+ * Colour is left to the call site so each works on light and dark.
+ */
+@utility type-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.375rem;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  @media (width >= 40rem) {
+    font-size: 4rem;
+  }
+  @media (width >= 64rem) {
+    font-size: 4.5rem;
+  }
+}
+@utility type-h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.25rem;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  @media (width >= 40rem) {
+    font-size: 3rem;
+  }
+}
+@utility type-statement {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  @media (width >= 40rem) {
+    font-size: 2.375rem;
+  }
+}
+@utility type-h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+@utility type-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@utility type-lead {
+  font-size: 1.125rem;
+  line-height: 1.65;
+  @media (width >= 40rem) {
+    font-size: 1.1875rem;
+  }
+}
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.65;
+}
+@utility type-meta {
+  font-size: 0.875rem;
+  line-height: 1.5;
 }

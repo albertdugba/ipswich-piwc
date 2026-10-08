@@ -26,20 +26,20 @@ export function StatCard({
   const up = (trend ?? 0) >= 0
 
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-card p-5 text-card-foreground ring-1 ring-foreground/10 transition-shadow hover:shadow-sm">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl bg-card p-3.5 text-card-foreground ring-1 ring-foreground/10 transition-shadow hover:shadow-sm sm:p-5">
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-xs leading-snug font-medium text-muted-foreground sm:text-sm">
           {label}
         </span>
         {icon ? (
-          <span className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-            <HugeiconsIcon icon={icon} className="size-4" />
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 sm:size-8">
+            <HugeiconsIcon icon={icon} className="size-3.5 sm:size-4" />
           </span>
         ) : null}
       </div>
-      <div className="mt-3 flex items-end justify-between gap-2">
+      <div className="mt-auto flex items-end justify-between gap-2 pt-2 sm:pt-3">
         <div className="min-w-0">
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-2xl font-semibold tracking-tight text-foreground tabular-nums">
               {value}
             </span>
@@ -59,10 +59,12 @@ export function StatCard({
             ) : null}
           </div>
           {hint ? (
-            <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+            <p className="mt-0.5 truncate text-[11px] text-muted-foreground sm:mt-1 sm:text-xs">
+              {hint}
+            </p>
           ) : null}
         </div>
-        {chart ? <div className="shrink-0">{chart}</div> : null}
+        {chart ? <div className="hidden shrink-0 sm:block">{chart}</div> : null}
       </div>
     </div>
   )

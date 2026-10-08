@@ -9,14 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as PublicRouteImport } from './routes/_public'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppPrayerRequestsRouteImport } from './routes/_app/prayer-requests'
 import { Route as AppRemindersRouteImport } from './routes/_app/reminders'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppTestimoniesRouteImport } from './routes/_app/testimonies'
+import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AppAttendanceIndexRouteImport } from './routes/_app/attendance/index'
 import { Route as AppAttendanceServiceIdRouteImport } from './routes/_app/attendance/$serviceId'
 import { Route as AppContributionsIndexRouteImport } from './routes/_app/contributions/index'
@@ -26,13 +27,12 @@ import { Route as AppMinistriesDepartmentIdRouteImport } from './routes/_app/min
 import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
 import { Route as AppPeoplePersonIdRouteImport } from './routes/_app/people/$personId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicRoute = PublicRouteImport.update({
+  id: '/_public',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -64,6 +64,11 @@ const AppTestimoniesRoute = AppTestimoniesRouteImport.update({
   id: '/testimonies',
   path: '/testimonies',
   getParentRoute: () => AppRoute,
+} as any)
+const PublicIndexRoute = PublicIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicRoute,
 } as any)
 const AppAttendanceIndexRoute = AppAttendanceIndexRouteImport.update({
   id: '/attendance/',
@@ -108,7 +113,7 @@ const AppPeoplePersonIdRoute = AppPeoplePersonIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof PublicIndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AppDashboardRoute
   '/prayer-requests': typeof AppPrayerRequestsRoute
@@ -125,7 +130,7 @@ export interface FileRoutesByFullPath {
   '/people/': typeof AppPeopleIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof PublicIndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AppDashboardRoute
   '/prayer-requests': typeof AppPrayerRequestsRoute
@@ -143,14 +148,15 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/_public': typeof PublicRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/prayer-requests': typeof AppPrayerRequestsRoute
   '/_app/reminders': typeof AppRemindersRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/testimonies': typeof AppTestimoniesRoute
+  '/_public/': typeof PublicIndexRoute
   '/_app/attendance/$serviceId': typeof AppAttendanceServiceIdRoute
   '/_app/contributions/$fundId': typeof AppContributionsFundIdRoute
   '/_app/ministries/$departmentId': typeof AppMinistriesDepartmentIdRoute
@@ -197,14 +203,15 @@ export interface FileRouteTypes {
     | '/people'
   id:
     | '__root__'
-    | '/'
     | '/_app'
+    | '/_public'
     | '/login'
     | '/_app/dashboard'
     | '/_app/prayer-requests'
     | '/_app/reminders'
     | '/_app/settings'
     | '/_app/testimonies'
+    | '/_public/'
     | '/_app/attendance/$serviceId'
     | '/_app/contributions/$fundId'
     | '/_app/ministries/$departmentId'
@@ -216,25 +223,25 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  PublicRoute: typeof PublicRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app': {
       id: '/_app'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -278,6 +285,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/testimonies'
       preLoaderRoute: typeof AppTestimoniesRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_public/': {
+      id: '/_public/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
     }
     '/_app/attendance/': {
       id: '/_app/attendance/'
@@ -372,9 +386,20 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface PublicRouteChildren {
+  PublicIndexRoute: typeof PublicIndexRoute
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicIndexRoute: PublicIndexRoute,
+}
+
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  PublicRoute: PublicRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport

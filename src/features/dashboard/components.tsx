@@ -1,9 +1,12 @@
 import { useState } from 'react'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ActivityCalendarIcon,
   AlertIcon,
   ArrowDownRight01Icon,
   ArrowUpRight01Icon,
+  AttendanceIcon,
+  BirthdayIcon,
   CheckIcon,
   ChevronRightIcon,
   HugeiconsIcon,
@@ -16,30 +19,37 @@ import {
 } from '@/lib/icons'
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
+import { PersonFormDialog } from '@/features/people/PersonFormDialog'
+import { ServiceFormDialog } from '@/features/attendance/ServiceFormDialog'
+import { hasPermission } from '@/lib/auth/permissions'
+import { isFirebaseConfigured } from '@/lib/env.public'
 import { cn, initials } from '@/lib/utils'
-import {
-  AreaChart,
-  BarChart,
-  DonutChart,
-  type ChartPoint,
-  type DonutSegment,
-} from './charts'
+import type { AuthUser } from '@/lib/auth/session'
+import { AreaChart, BarChart, RankedBars, type ChartPoint } from './charts'
 import type { DashboardSummary } from './mock-data'
 
-function TrendBadge({ value, suffix = '' }: { value: number; suffix?: string }) {
+function TrendBadge({
+  value,
+  suffix = '',
+  className,
+}: {
+  value: number
+  suffix?: string
+  className?: string
+}) {
   const up = value >= 0
   return (
     <span
       className={cn(
         'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold',
-        up
-          ? 'bg-emerald-50 text-emerald-700'
-          : 'bg-red-50 text-red-700',
+        up ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700',
+        className,
       )}
     >
       <HugeiconsIcon
@@ -50,6 +60,275 @@ function TrendBadge({ value, suffix = '' }: { value: number; suffix?: string }) 
       {value}
       {suffix}
     </span>
+  )
+}
+
+function greetingFor(hour: number) {
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+/**
+ * Brand-coloured welcome band. Leads with the one number leaders ask about
+ * first — how many came to the last service.
+ */
+export function DashboardHero({
+  user,
+  attendance,
+}: {
+  user: AuthUser
+  attendance: DashboardSummary['attendance']
+}) {
+  const now = new Date()
+  const firstName = user.displayName.split(' ')[0]
+  const dateLabel = now.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+  const up = attendance.trendPct >= 0
+
+  return (
+    <section className="relative overflow-hidden rounded-2xl bg-linear-to-br from-brand-600 via-brand-700 to-brand-900 p-5 text-white shadow-sm sm:p-7">
+      {/* Soft gold glow, echoing the logo's banner. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 -right-16 size-64 rounded-full bg-gold-400/25 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-28 -left-10 size-56 rounded-full bg-brand-400/30 blur-3xl"
+      />
+
+      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p
+            className="text-xs font-medium tracking-wide text-white/70 uppercase"
+            suppressHydrationWarning
+          >
+            {dateLabel}
+          </p>
+          <h1
+            className="mt-1.5 text-2xl font-semibold tracking-tight sm:text-3xl"
+            suppressHydrationWarning
+          >
+            {greetingFor(now.getHours())}, {firstName}
+          </h1>
+          <p className="mt-1 text-sm text-white/75">
+            Here’s what’s happening at Ipswich PIWC.
+          </p>
+        </div>
+
+        <Link
+          to="/attendance"
+          className="group flex items-center gap-4 rounded-xl bg-white/10 p-3.5 ring-1 ring-white/15 backdrop-blur-sm transition-colors hover:bg-white/15 sm:min-w-64"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs text-white/70">
+              {attendance.latestServiceName} · {attendance.latestServiceDate}
+            </p>
+            <div className="mt-0.5 flex items-baseline gap-2">
+              <span className="text-3xl font-semibold tracking-tight tabular-nums">
+                {attendance.latestCount}
+              </span>
+              <span className="text-sm text-white/75">attended</span>
+            </div>
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-white/80">
+              <HugeiconsIcon
+                icon={up ? ArrowUpRight01Icon : ArrowDownRight01Icon}
+                className={cn(
+                  'size-3.5',
+                  up ? 'text-emerald-300' : 'text-red-300',
+                )}
+              />
+              <span
+                className={cn(
+                  'font-semibold',
+                  up ? 'text-emerald-300' : 'text-red-300',
+                )}
+              >
+                {up ? '+' : ''}
+                {attendance.trendPct}%
+              </span>
+              vs average of {attendance.average}
+            </p>
+          </div>
+          <HugeiconsIcon
+            icon={ChevronRightIcon}
+            className="size-5 shrink-0 text-white/60 transition-transform group-hover:translate-x-0.5"
+          />
+        </Link>
+      </div>
+    </section>
+  )
+}
+
+const actionTileClass =
+  'group flex flex-col items-center gap-2 rounded-xl p-1 text-center transition-colors sm:flex-row sm:items-center sm:gap-3 sm:bg-card sm:p-3 sm:text-left sm:ring-1 sm:ring-foreground/10 sm:hover:ring-brand-200'
+
+function ActionTileBody({
+  icon,
+  label,
+  hint,
+  tone,
+}: {
+  icon: IconSvgElement
+  label: string
+  hint: string
+  tone: string
+}) {
+  return (
+    <>
+      <span
+        className={cn(
+          'flex size-13 items-center justify-center rounded-2xl ring-1 ring-foreground/5 transition-transform group-active:scale-95 sm:size-10 sm:rounded-xl',
+          tone,
+        )}
+      >
+        <HugeiconsIcon icon={icon} className="size-6 sm:size-5" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-xs leading-tight font-medium whitespace-nowrap text-foreground sm:text-sm">
+          {label}
+        </span>
+        <span className="hidden truncate text-xs text-muted-foreground sm:block">
+          {hint}
+        </span>
+      </span>
+    </>
+  )
+}
+
+/**
+ * The jobs people open the app to do, one tap away. App-style icon tiles on
+ * phones; compact cards from `sm` up.
+ */
+export function QuickActions({ user }: { user: AuthUser }) {
+  const navigate = useNavigate()
+  const [addingPerson, setAddingPerson] = useState(false)
+  const [addingService, setAddingService] = useState(false)
+
+  const canAddPerson =
+    isFirebaseConfigured && hasPermission(user.role, 'people:write')
+  const canAddService =
+    isFirebaseConfigured && hasPermission(user.role, 'attendance:write')
+
+  return (
+    <>
+      <nav
+        aria-label="Quick actions"
+        className="grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-4"
+      >
+        {canAddPerson ? (
+          <button
+            type="button"
+            onClick={() => setAddingPerson(true)}
+            className={actionTileClass}
+          >
+            <ActionTileBody
+              icon={VisitorIcon}
+              label="Add member"
+              hint="New member or visitor"
+              tone="bg-brand-50 text-brand-600"
+            />
+          </button>
+        ) : (
+          <Link to="/people" className={actionTileClass}>
+            <ActionTileBody
+              icon={VisitorIcon}
+              label="Members"
+              hint="Browse the directory"
+              tone="bg-brand-50 text-brand-600"
+            />
+          </Link>
+        )}
+
+        {canAddService ? (
+          <button
+            type="button"
+            onClick={() => setAddingService(true)}
+            className={actionTileClass}
+          >
+            <ActionTileBody
+              icon={AttendanceIcon}
+              label="Attendance"
+              hint="Record a service"
+              tone="bg-emerald-50 text-emerald-600"
+            />
+          </button>
+        ) : (
+          <Link to="/attendance" className={actionTileClass}>
+            <ActionTileBody
+              icon={AttendanceIcon}
+              label="Attendance"
+              hint="Services & trends"
+              tone="bg-emerald-50 text-emerald-600"
+            />
+          </Link>
+        )}
+
+        <Link to="/prayer-requests" className={actionTileClass}>
+          <ActionTileBody
+            icon={PrayerIcon}
+            label="Prayer"
+            hint="Requests to pray over"
+            tone="bg-sky-50 text-sky-600"
+          />
+        </Link>
+
+        <Link to="/reminders" className={actionTileClass}>
+          <ActionTileBody
+            icon={BirthdayIcon}
+            label="Celebrations"
+            hint="Birthdays & anniversaries"
+            tone="bg-gold-100 text-gold-700"
+          />
+        </Link>
+      </nav>
+
+      {canAddPerson ? (
+        <PersonFormDialog
+          open={addingPerson}
+          onOpenChange={setAddingPerson}
+          onCreated={(id) =>
+            navigate({ to: '/people/$personId', params: { personId: id } })
+          }
+        />
+      ) : null}
+      {canAddService ? (
+        <ServiceFormDialog
+          open={addingService}
+          onOpenChange={setAddingService}
+          onCreated={(id) =>
+            navigate({
+              to: '/attendance/$serviceId',
+              params: { serviceId: id },
+            })
+          }
+        />
+      ) : null}
+    </>
+  )
+}
+
+function CardLink({
+  to,
+  children,
+}: {
+  to: '/attendance' | '/ministries'
+  children: string
+}) {
+  return (
+    <CardAction>
+      <Link
+        to={to}
+        className="-my-1 inline-flex items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-brand-600 hover:bg-brand-50"
+      >
+        {children}
+        <HugeiconsIcon icon={ChevronRightIcon} className="size-3.5" />
+      </Link>
+    </CardAction>
   )
 }
 
@@ -64,33 +343,19 @@ export function AttendanceTrendCard({
   }))
   return (
     <Card>
-      <CardHeader className="border-b">
-        <CardTitle>Attendance trend</CardTitle>
+      <CardHeader>
+        <CardTitle>Attendance</CardTitle>
         <CardDescription>
-          Latest: {data.latestServiceName}, {data.latestServiceDate}
+          Last {data.weekly.length} services · avg {data.average}
         </CardDescription>
+        <CardLink to="/attendance">View all</CardLink>
       </CardHeader>
       <CardContent>
-        <div className="flex items-end justify-between gap-2">
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-semibold tracking-tight text-foreground tabular-nums">
-                {data.latestCount}
-              </span>
-              <TrendBadge value={data.trendPct} suffix="%" />
-            </div>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              vs average of {data.average} per service
-            </p>
-          </div>
-        </div>
-        <div className="mt-2">
-          <BarChart
-            data={points}
-            average={data.average}
-            ariaLabel={`Attendance over the last ${data.weekly.length} services`}
-          />
-        </div>
+        <BarChart
+          data={points}
+          average={data.average}
+          ariaLabel={`Attendance over the last ${data.weekly.length} services`}
+        />
       </CardContent>
     </Card>
   )
@@ -114,14 +379,12 @@ export function MembershipGrowthCard({
   }))
   return (
     <Card>
-      <CardHeader className="border-b">
+      <CardHeader>
         <CardTitle>Membership growth</CardTitle>
-        <CardDescription>
-          Total members over the last {months.length} months
-        </CardDescription>
+        <CardDescription>Last {months.length} months</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-baseline gap-2">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <span className="text-3xl font-semibold tracking-tight text-foreground tabular-nums">
             {last.total}
           </span>
@@ -141,7 +404,6 @@ export function MembershipGrowthCard({
   )
 }
 
-
 export function NeedsAttentionCard({
   data,
 }: {
@@ -149,21 +411,21 @@ export function NeedsAttentionCard({
 }) {
   return (
     <Card>
-      <CardHeader className="border-b">
+      <CardHeader>
         <CardTitle>Needs attention</CardTitle>
-        <CardDescription>
-          What the church might otherwise forget
-        </CardDescription>
+        <CardDescription>People who shouldn’t slip through</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-2.5">
           <AttentionTile
+            to="/people"
             icon={VisitorIcon}
             tone="amber"
             label="Visitors to follow up"
             value={data.visitorsToFollowUp}
           />
           <AttentionTile
+            to="/prayer-requests"
             icon={PrayerIcon}
             tone="sky"
             label="New prayer requests"
@@ -178,21 +440,23 @@ export function NeedsAttentionCard({
 
 const TILE_TONES = {
   amber: {
-    chip: 'bg-amber-100 text-amber-600',
-    ring: 'ring-amber-100 hover:ring-amber-200',
+    tile: 'bg-amber-50/70 ring-amber-100 hover:ring-amber-300',
+    chip: 'bg-amber-100 text-amber-700',
   },
   sky: {
-    chip: 'bg-sky-100 text-sky-600',
-    ring: 'ring-sky-100 hover:ring-sky-200',
+    tile: 'bg-sky-50/70 ring-sky-100 hover:ring-sky-300',
+    chip: 'bg-sky-100 text-sky-700',
   },
 } as const
 
 function AttentionTile({
+  to,
   icon,
   label,
   value,
   tone,
 }: {
+  to: '/people' | '/prayer-requests'
   icon: IconSvgElement
   label: string
   value: number
@@ -200,32 +464,34 @@ function AttentionTile({
 }) {
   const t = TILE_TONES[tone]
   return (
-    <button
-      type="button"
+    <Link
+      to={to}
       className={cn(
-        'group flex flex-col items-start gap-2 rounded-xl bg-card p-3 text-left ring-1 transition-all hover:-translate-y-px',
-        t.ring,
+        'group flex flex-col gap-1.5 rounded-xl p-3 ring-1 transition-shadow active:scale-[0.98]',
+        t.tile,
       )}
     >
-      <span
-        className={cn(
-          'flex size-9 items-center justify-center rounded-lg',
-          t.chip,
-        )}
-      >
-        <HugeiconsIcon icon={icon} className="size-5" />
+      <span className="flex items-center justify-between">
+        <span
+          className={cn(
+            'flex size-8 items-center justify-center rounded-lg',
+            t.chip,
+          )}
+        >
+          <HugeiconsIcon icon={icon} className="size-4" />
+        </span>
+        <HugeiconsIcon
+          icon={ChevronRightIcon}
+          className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+        />
       </span>
       <span className="text-2xl font-semibold tracking-tight text-foreground tabular-nums">
         {value}
       </span>
-      <span className="flex w-full items-center justify-between gap-1 text-xs font-medium text-muted-foreground">
+      <span className="text-xs leading-snug font-medium text-muted-foreground">
         {label}
-        <HugeiconsIcon
-          icon={ChevronRightIcon}
-          className="size-3.5 shrink-0 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
-        />
       </span>
-    </button>
+    </Link>
   )
 }
 
@@ -239,29 +505,34 @@ function AbsentMembersList({
   const allDone = remaining === 0 && members.length > 0
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border-subtle">
-      <div className="flex items-center justify-between gap-2 bg-muted/40 px-3.5 py-2.5">
-        <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-          <HugeiconsIcon icon={AlertIcon} className="size-4 text-amber-500" />
-          Members not attending recently
+    <div className="overflow-hidden rounded-xl ring-1 ring-border-subtle">
+      <div className="flex items-center justify-between gap-2 bg-muted/50 px-3 py-2">
+        <span className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+          <HugeiconsIcon
+            icon={AlertIcon}
+            className="size-4 shrink-0 text-amber-500"
+          />
+          <span className="truncate">Missing recently</span>
         </span>
         <span
           className={cn(
-            'text-xs font-medium tabular-nums',
-            allDone ? 'text-emerald-600' : 'text-muted-foreground',
+            'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums',
+            allDone
+              ? 'bg-emerald-50 text-emerald-700'
+              : 'bg-amber-50 text-amber-700',
           )}
         >
           {allDone ? 'All reached' : `${remaining} to reach`}
         </span>
       </div>
-      <ul className="divide-y divide-border-subtle border-t border-border-subtle">
+      <ul className="divide-y divide-border-subtle">
         {members.map((m) => {
           const isContacted = contacted[m.name]
           return (
             <li
               key={m.name}
               className={cn(
-                'flex items-center gap-3 px-3.5 py-2.5 transition-colors',
+                'flex items-center gap-3 px-3 py-2.5 transition-colors',
                 isContacted && 'bg-emerald-50/50',
               )}
             >
@@ -289,10 +560,10 @@ function AbsentMembersList({
                 >
                   {m.name}
                 </span>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="block truncate text-xs text-muted-foreground">
                   {isContacted
                     ? 'Contacted just now'
-                    : `Last seen ${m.lastSeen}`}
+                    : `${m.weeks} weeks · last seen ${m.lastSeen}`}
                 </span>
               </span>
 
@@ -305,25 +576,23 @@ function AbsentMembersList({
                   }))
                 }
                 aria-pressed={isContacted}
+                title={isContacted ? 'Undo' : 'Mark contacted'}
                 aria-label={
                   isContacted
                     ? `Undo contacted for ${m.name}`
                     : `Mark ${m.name} contacted`
                 }
                 className={cn(
-                  'flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                  'flex size-9 shrink-0 items-center justify-center gap-1.5 rounded-lg text-xs font-medium ring-1 transition-colors',
                   isContacted
-                    ? 'border-transparent text-muted-foreground hover:bg-black/5'
-                    : 'border-border-subtle text-foreground hover:border-brand-600 hover:bg-brand-600 hover:text-white',
+                    ? 'text-muted-foreground ring-transparent hover:bg-black/5'
+                    : 'text-foreground ring-border-subtle hover:bg-brand-600 hover:text-white hover:ring-brand-600',
                 )}
               >
                 <HugeiconsIcon
                   icon={isContacted ? CheckIcon : PhoneIcon}
-                  className="size-3.5"
+                  className="size-4"
                 />
-                <span className="hidden sm:inline">
-                  {isContacted ? 'Undo' : 'Mark contacted'}
-                </span>
               </button>
             </li>
           )
@@ -333,82 +602,30 @@ function AbsentMembersList({
   )
 }
 
-// On-brand categorical palette (indigo → gold → flame), cycled if there are
-// more ministries than colours.
-const MINISTRY_COLORS = [
-  'var(--color-brand-600)',
-  'var(--color-brand-400)',
-  'var(--color-gold-500)',
-  'var(--color-flame-500)',
-  'var(--color-brand-800)',
-  'var(--color-gold-600)',
-  'var(--color-brand-300)',
-  'var(--color-flame-600)',
-]
-
 export function MinistryBreakdownCard({
   data,
 }: {
   data: DashboardSummary['ministries']
 }) {
-  const [active, setActive] = useState<number | null>(null)
   const total = data.byMinistry.reduce((sum, m) => sum + m.count, 0)
-  const segments: DonutSegment[] = data.byMinistry.map((m, i) => ({
-    label: m.name,
-    value: m.count,
-    color: MINISTRY_COLORS[i % MINISTRY_COLORS.length]!,
-  }))
-
   return (
     <Card>
-      <CardHeader className="border-b">
-        <CardTitle>Membership by ministry</CardTitle>
+      <CardHeader>
+        <CardTitle>Ministries</CardTitle>
         <CardDescription>
-          {data.total} ministries · {total} members
+          {data.total} ministries · {total} places filled
         </CardDescription>
+        <CardLink to="/ministries">View all</CardLink>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-5">
-          <DonutChart
-            segments={segments}
-            centerValue={total}
-            centerLabel="members"
-            active={active}
-            onActiveChange={setActive}
-            ariaLabel={`Membership across ${data.total} ministries`}
-          />
-          <ul className="grid w-full grid-cols-1 gap-x-5 gap-y-1.5 sm:grid-cols-2">
-            {segments.map((seg, i) => {
-              const pct = total ? Math.round((seg.value / total) * 100) : 0
-              const dim = active != null && active !== i
-              return (
-                <li
-                  key={seg.label}
-                  onMouseEnter={() => setActive(i)}
-                  onMouseLeave={() => setActive(null)}
-                  className={cn(
-                    'flex items-center gap-2 rounded-md px-1.5 py-1 text-sm transition-opacity',
-                    dim && 'opacity-40',
-                  )}
-                >
-                  <span
-                    className="size-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: seg.color }}
-                  />
-                  <span className="min-w-0 flex-1 truncate text-foreground">
-                    {seg.label}
-                  </span>
-                  <span className="font-medium text-foreground tabular-nums">
-                    {seg.value}
-                  </span>
-                  <span className="w-9 text-right text-xs text-muted-foreground tabular-nums">
-                    {pct}%
-                  </span>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+        <RankedBars
+          items={data.byMinistry.map((m) => ({
+            label: m.name,
+            value: m.count,
+          }))}
+          total={total}
+          ariaLabel={`Members across ${data.total} ministries`}
+        />
       </CardContent>
     </Card>
   )
@@ -432,22 +649,31 @@ export function RecentActivityCard({
 }) {
   return (
     <Card>
-      <CardHeader className="border-b">
+      <CardHeader>
         <CardTitle>Recent activity</CardTitle>
       </CardHeader>
       <CardContent>
-        <ol className="space-y-4">
-          {data.map((a) => (
-            <li key={a.id} className="flex gap-3">
-              <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+        <ol className="relative">
+          {data.map((a, i) => (
+            <li key={a.id} className="relative flex gap-3 pb-4 last:pb-0">
+              {/* Timeline rail between icons. */}
+              {i < data.length - 1 ? (
+                <span
+                  aria-hidden
+                  className="absolute top-8 bottom-0 left-3.5 w-px bg-border-subtle"
+                />
+              ) : null}
+              <span className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600 ring-4 ring-card">
                 <HugeiconsIcon
                   icon={activityIcon[a.type]}
                   className="size-3.5"
                 />
               </span>
-              <div>
+              <div className="min-w-0 flex-1 pt-0.5 sm:flex sm:items-baseline sm:justify-between sm:gap-4">
                 <p className="text-sm text-foreground">{a.summary}</p>
-                <p className="text-xs text-muted-foreground">{a.when}</p>
+                <p className="shrink-0 text-xs text-muted-foreground">
+                  {a.when}
+                </p>
               </div>
             </li>
           ))}

@@ -1,12 +1,20 @@
 import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { usePeople } from '@/features/people/queries'
 import {
   AnniversaryIcon,
   BirthdayIcon,
+  ChevronRightIcon,
   HugeiconsIcon,
   MembersIcon,
 } from '@/lib/icons'
@@ -49,14 +57,18 @@ export function UpcomingCelebrationsCard({
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between border-b">
+      <CardHeader>
         <CardTitle>Upcoming celebrations</CardTitle>
-        <Link
-          to="/reminders"
-          className="text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-        >
-          View all
-        </Link>
+        <CardDescription>Next {windowDays} days</CardDescription>
+        <CardAction>
+          <Link
+            to="/reminders"
+            className="-my-1 inline-flex items-center gap-0.5 rounded-md px-1.5 py-1 text-xs font-medium text-brand-600 hover:bg-brand-50"
+          >
+            View all
+            <HugeiconsIcon icon={ChevronRightIcon} className="size-3.5" />
+          </Link>
+        </CardAction>
       </CardHeader>
       <CardContent>
         {peopleQuery.isLoading ? (
@@ -69,7 +81,7 @@ export function UpcomingCelebrationsCard({
             ))}
           </ul>
         ) : shown.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="rounded-lg bg-muted/40 px-3 py-4 text-center text-sm text-muted-foreground">
             Nothing in the next {windowDays} days.
           </p>
         ) : (

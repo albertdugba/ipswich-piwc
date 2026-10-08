@@ -5,12 +5,14 @@ import {
   UserCheck01Icon,
   VisitorIcon,
 } from '@/lib/icons'
-import { PageHeader, StatCard } from '@/components/ui'
+import { StatCard } from '@/components/ui'
 import {
   AttendanceTrendCard,
+  DashboardHero,
   MembershipGrowthCard,
   MinistryBreakdownCard,
   NeedsAttentionCard,
+  QuickActions,
   RecentActivityCard,
 } from '@/features/dashboard/components'
 import { dashboardMock } from '@/features/dashboard/mock-data'
@@ -27,13 +29,12 @@ function DashboardPage() {
   const { user } = Route.useRouteContext()
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={`Welcome, ${user.displayName.split(' ')[0]}`}
-        description="Here’s what’s happening at Ipswich PIWC today."
-      />
+    <div className="space-y-5 sm:space-y-6">
+      <DashboardHero user={user} attendance={summary.attendance} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <QuickActions user={user} />
+
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Total members"
           value={summary.membership.total}
@@ -56,6 +57,7 @@ function DashboardPage() {
           label="New this month"
           value={summary.membership.newThisMonth}
           icon={VisitorIcon}
+          hint="Joined since the 1st"
         />
         <StatCard
           label="Visitors"
@@ -65,23 +67,35 @@ function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <AttendanceTrendCard data={summary.attendance} />
+      {/*
+        Phones get one column ordered by urgency (to-dos before charts); the
+        two column wrappers dissolve via `contents` so `order-*` can interleave
+        their cards. From `lg` they become a main column and a side rail.
+      */}
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-start">
+        <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-4">
+          <div className="order-2 lg:order-none">
+            <AttendanceTrendCard data={summary.attendance} />
+          </div>
+          <div className="order-4 lg:order-none">
+            <MembershipGrowthCard data={summary.membershipGrowth} />
+          </div>
+          <div className="order-6 lg:order-none">
+            <RecentActivityCard data={summary.recentActivity} />
+          </div>
         </div>
-        <NeedsAttentionCard data={summary.needsAttention} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <MembershipGrowthCard data={summary.membershipGrowth} />
+        <div className="contents lg:flex lg:flex-col lg:gap-4">
+          <div className="order-1 lg:order-none">
+            <NeedsAttentionCard data={summary.needsAttention} />
+          </div>
+          <div className="order-3 lg:order-none">
+            <UpcomingCelebrationsCard windowDays={7} />
+          </div>
+          <div className="order-5 lg:order-none">
+            <MinistryBreakdownCard data={summary.ministries} />
+          </div>
         </div>
-        <MinistryBreakdownCard data={summary.ministries} />
       </div>
-
-      <UpcomingCelebrationsCard windowDays={7} />
-
-      <RecentActivityCard data={summary.recentActivity} />
     </div>
   )
 }

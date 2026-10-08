@@ -14,6 +14,12 @@ importers:
       '@fontsource-variable/geist':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource-variable/instrument-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/newsreader':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@hookform/resolvers':
         specifier: ^5.9.1
         version: 5.9.1(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(react-hook-form@7.87.0(react@19.2.8))(zod@4.4.3)
@@ -47,6 +53,9 @@ importers:
       firebase-admin:
         specifier: ^14.2.0
         version: 14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)
+      framer-motion:
+        specifier: ^13.2.0
+        version: 13.2.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       nitro:
         specifier: 3.0.260903-beta
         version: 3.0.260903-beta
@@ -811,6 +820,12 @@ packages:
 
   '@fontsource-variable/geist@5.3.0':
     resolution: {integrity: sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA==}
+
+  '@fontsource-variable/instrument-sans@5.3.0':
+    resolution: {integrity: sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw==}
+
+  '@fontsource-variable/newsreader@5.3.0':
+    resolution: {integrity: sha512-rrzYi43qMpbzwuFtf9OkWH8sxAPVPcQQQEwXpPtwaKYeJ8yVg5aLs5kawmo1f2Q1t1M38TLmEKCkGVDsYwgdFw==}
 
   '@google-cloud/firestore@8.7.1':
     resolution: {integrity: sha512-Hp/WI8sH569ANitsko6RNvCUkzTCYudHoINOkQjiJq2FBG6kKnofBAW7PtS823cu6RMxHqK2RxRcspdjrRpUFA==}
@@ -2441,6 +2456,17 @@ packages:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
 
+  framer-motion@13.2.0:
+    resolution: {integrity: sha512-9E33ebgMaO33w1nN/jEdW8z3/GO483fMi4rqbMG9rt83XgW9QLKRe4NcmJ8s+fQ3O34++UHrIQwlIWGIWTITjA==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
     engines: {node: '>= 0.8'}
@@ -3204,6 +3230,12 @@ packages:
   minipass@7.1.3:
     resolution: {integrity: sha512-tEBHqDnIoM/1rXME1zgka9g6Q2lcoCkxHLuc7ODJ5BxbP5d4c2Z5cGgtXAku59200Cx7diuHTOYfSBD8n6mm8A==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  motion-dom@13.2.0:
+    resolution: {integrity: sha512-N6gdSoWRDk0Rh/fVtlqUtLs+fEN3ELFZI3cn3IQE9Mnf3E+Mh8wjO6MstzCOPFh4Yf0L1as5m2eUyYWj8ylVSQ==}
+
+  motion-utils@13.0.0:
+    resolution: {integrity: sha512-7DnN7TmbLcYXcG4RVadXIihWlyuM9afoUww8Y5Agg431kGKiuL2/OMyP4mJ5wLz+pvN3t5ySClLOaVXJ+wekRQ==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -4947,6 +4979,10 @@ snapshots:
 
   '@fontsource-variable/geist@5.3.0': {}
 
+  '@fontsource-variable/instrument-sans@5.3.0': {}
+
+  '@fontsource-variable/newsreader@5.3.0': {}
+
   '@google-cloud/firestore@8.7.1':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -6633,6 +6669,15 @@ snapshots:
 
   forwarded@0.2.0: {}
 
+  framer-motion@13.2.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      motion-dom: 13.2.0
+      motion-utils: 13.0.0
+      tslib: 2.8.1
+    optionalDependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+
   fresh@2.0.0: {}
 
   fs-extra@11.4.0:
@@ -7362,6 +7407,12 @@ snapshots:
 
   minipass@7.1.3:
     optional: true
+
+  motion-dom@13.2.0:
+    dependencies:
+      motion-utils: 13.0.0
+
+  motion-utils@13.0.0: {}
 
   ms@2.1.3: {}
 
