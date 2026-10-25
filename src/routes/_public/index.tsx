@@ -324,7 +324,7 @@ function FindUs() {
             href={directionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-brand-600 px-6 text-sm font-semibold text-white transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700"
+            className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-brand-600 px-6 text-sm font-semibold text-gold-400 transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700"
           >
             <HugeiconsIcon icon={DirectionsIcon} className="size-4" />
             Get directions

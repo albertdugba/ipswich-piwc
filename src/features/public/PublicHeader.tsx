@@ -69,7 +69,7 @@ export function PublicHeader() {
         <Link
           to="/"
           hash="visit"
-          className="hidden h-10 shrink-0 items-center gap-1.5 rounded-full bg-brand-600 px-4 sm:inline-flex text-sm font-semibold text-white transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700 sm:h-11 sm:px-5"
+          className="hidden h-10 shrink-0 items-center gap-1.5 rounded-full bg-brand-600 px-4 sm:inline-flex text-sm font-semibold text-gold-400 transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700 sm:h-11 sm:px-5"
         >
           Plan your visit
           <HugeiconsIcon icon={ChevronRightIcon} className="size-4" />

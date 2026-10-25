@@ -99,7 +99,7 @@ function RailButton({
       disabled={disabled}
       aria-label={label}
       className={cn(
-        'flex size-11 items-center justify-center rounded-full border border-stone-300 bg-white text-ink transition-colors hover:border-brand-600 hover:bg-brand-600 hover:text-white',
+        'flex size-11 items-center justify-center rounded-full border border-stone-300 bg-white text-ink transition-colors hover:border-brand-600 hover:bg-brand-600 hover:text-gold-400',
         'disabled:pointer-events-none disabled:opacity-35',
       )}
     >

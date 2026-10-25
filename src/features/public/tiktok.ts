@@ -116,7 +116,7 @@ function parseEmbedPage(html: string, username: string): TikTokFeedData | null {
 }
 
 export const getTikTokFeed = createServerFn({ method: 'GET' })
-  .inputValidator((username: string) => {
+  .validator((username: string) => {
     const handle = username.replace(/^@/, '')
     if (!USERNAME_RE.test(handle)) throw new Error('Invalid TikTok username')
     return handle

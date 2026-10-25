@@ -209,7 +209,7 @@ function PrayerRequestForm() {
       <button
         type="submit"
         disabled={submit.isPending}
-        className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-7 text-sm font-semibold text-white transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700 disabled:opacity-70 sm:w-auto"
+        className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-7 text-sm font-semibold text-gold-400 transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700 disabled:opacity-70 sm:w-auto"
       >
         {submit.isPending ? (
           <HugeiconsIcon icon={SpinnerIcon} className="size-4 animate-spin" />

@@ -127,7 +127,7 @@ function FollowButton({ href, handle }: { href: string; handle: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-full bg-brand-600 px-5 text-sm font-semibold text-white transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700 sm:self-auto"
+      className="inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-full bg-brand-600 px-5 text-sm font-semibold text-gold-400 transition-[color,background-color,border-color,scale] duration-200 ease-out active:scale-[0.97] hover:bg-brand-700 sm:self-auto"
     >
       <HugeiconsIcon icon={TiktokIcon} className="size-4" />
       Follow @{handle}
@@ -284,7 +284,7 @@ function RailArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={side === 'left' ? 'Previous videos' : 'Next videos'}
-      className="flex size-11 items-center justify-center rounded-full border border-stone-300 bg-white text-ink transition-colors hover:border-brand-600 hover:bg-brand-600 hover:text-white disabled:pointer-events-none disabled:opacity-35"
+      className="flex size-11 items-center justify-center rounded-full border border-stone-300 bg-white text-ink transition-colors hover:border-brand-600 hover:bg-brand-600 hover:text-gold-400 disabled:pointer-events-none disabled:opacity-35"
     >
       <HugeiconsIcon
         icon={side === 'left' ? BackIcon : ChevronRightIcon}
